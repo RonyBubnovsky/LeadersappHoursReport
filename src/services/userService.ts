@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 
+const isDev = process.env.NODE_ENV === 'development'
+
 /**
  * Deletes the current user and all their associated data.
  * Removes entries, sheets, and the user account from Supabase.
@@ -19,6 +21,8 @@ export async function deleteUserAndData(userId: string): Promise<void> {
       .from('entries')
       .delete()
       .in('sheet_id', sheetIds)
+    
+    if (isDev) console.log(`✓ Deleted ${sheets.length} sheets and their entries`)
   }
 
   // Delete all sheets
@@ -32,6 +36,9 @@ export async function deleteUserAndData(userId: string): Promise<void> {
   
   // If admin delete fails (likely no admin access), sign out instead
   if (error) {
+    if (isDev) console.log('⚠ User deletion from Auth failed (no admin access), signing out instead')
     await supabase.auth.signOut()
+  } else {
+    if (isDev) console.log('✓ User successfully deleted from Auth')
   }
 }
