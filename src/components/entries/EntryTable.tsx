@@ -9,7 +9,13 @@ interface EntryTableProps {
 }
 
 export function EntryTable({ sheetId }: EntryTableProps) {
-  const { entries, loading, deleteEntry, totalPayHours } = useEntries(sheetId)
+  const { entries, loading, deleteEntry, deleteAllEntries, totalPayHours } = useEntries(sheetId)
+
+  const handleDeleteAll = async () => {
+    if (confirm('האם אתה בטוח שברצונך למחוק את כל הרשומות בגיליון זה?')) {
+      await deleteAllEntries()
+    }
+  }
 
   if (loading) {
     return (
@@ -34,7 +40,13 @@ export function EntryTable({ sheetId }: EntryTableProps) {
   return (
     <Card variant="bordered">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>רשומות</CardTitle>
+        <div className="flex items-center gap-4">
+          <CardTitle>רשומות</CardTitle>
+          <Button onClick={handleDeleteAll} variant="danger" size="sm">
+            <Trash2 className="w-4 h-4" />
+            מחק הכל
+          </Button>
+        </div>
         <div className="text-sm text-gray-500">
           סה״כ שעות לתשלום: <span className="text-blue-600 font-semibold">{totalPayHours.toFixed(2)}</span>
         </div>

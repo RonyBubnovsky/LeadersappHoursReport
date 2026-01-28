@@ -17,6 +17,7 @@ interface EntriesContextType {
   fetchEntriesForSheet: (sheetId: string) => void
   createEntry: (input: CreateEntryInput) => Promise<Entry>
   deleteEntry: (sheetId: string, entryId: string) => Promise<void>
+  deleteAllEntries: (sheetId: string) => Promise<void>
 }
 
 const EntriesContext = createContext<EntriesContextType | null>(null)
@@ -105,11 +106,26 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  const deleteAllEntries = async (sheetId: string) => {
+    const { error } = await supabase
+      .from('entries')
+      .delete()
+      .eq('sheet_id', sheetId)
+
+    if (error) throw error
+    
+    setEntriesBySheet(prev => ({
+      ...prev,
+      [sheetId]: []
+    }))
+  }
+
   const value = useMemo(() => ({
     getEntriesForSheet,
     fetchEntriesForSheet,
     createEntry,
     deleteEntry,
+    deleteAllEntries,
   }), [getEntriesForSheet, fetchEntriesForSheet])
 
   return (
@@ -143,5 +159,6 @@ export function useEntries(sheetId: string | null) {
     ...state,
     createEntry: context.createEntry,
     deleteEntry: (entryId: string) => sheetId ? context.deleteEntry(sheetId, entryId) : Promise.resolve(),
+    deleteAllEntries: () => sheetId ? context.deleteAllEntries(sheetId) : Promise.resolve(),
   }
 }

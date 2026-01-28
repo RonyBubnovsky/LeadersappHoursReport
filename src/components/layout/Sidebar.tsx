@@ -107,9 +107,18 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
 
       {/* User info & logout */}
       <div className="p-4 border-t border-gray-200 flex items-center justify-between">
-        <span className="text-sm text-gray-500 truncate max-w-[140px]">
-          {user?.email}
-        </span>
+        <div className="flex items-center gap-3 min-w-0">
+          {user?.user_metadata?.avatar_url && (
+            <img 
+              src={user.user_metadata.avatar_url} 
+              alt="Profile" 
+              className="w-8 h-8 rounded-full flex-shrink-0"
+            />
+          )}
+          <span className="text-sm text-gray-700 truncate">
+            {user?.user_metadata?.full_name || user?.email}
+          </span>
+        </div>
         <Button onClick={signOut} variant="ghost" size="sm">
           <LogOut className="w-4 h-4" />
         </Button>
