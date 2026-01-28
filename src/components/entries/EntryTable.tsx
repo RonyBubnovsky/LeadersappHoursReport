@@ -2,7 +2,7 @@
 
 import { Trash2 } from 'lucide-react'
 import { useEntries } from '@/hooks'
-import { Button, Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
+import { Button, Card, CardHeader, CardTitle, CardContent, useConfirm } from '@/components/ui'
 
 interface EntryTableProps {
   sheetId: string
@@ -10,10 +10,31 @@ interface EntryTableProps {
 
 export function EntryTable({ sheetId }: EntryTableProps) {
   const { entries, loading, deleteEntry, deleteAllEntries, totalPayHours } = useEntries(sheetId)
+  const confirm = useConfirm()
 
   const handleDeleteAll = async () => {
-    if (confirm('האם אתה בטוח שברצונך למחוק את כל הרשומות בגיליון זה?')) {
+    const confirmed = await confirm({
+      title: 'מחיקת כל הרשומות',
+      message: 'האם אתה בטוח שברצונך למחוק את כל הרשומות בגיליון זה? פעולה זו אינה ניתנת לביטול.',
+      confirmText: 'מחק הכל',
+      cancelText: 'ביטול',
+      variant: 'danger',
+    })
+    if (confirmed) {
       await deleteAllEntries()
+    }
+  }
+
+  const handleDeleteEntry = async (entryId: string) => {
+    const confirmed = await confirm({
+      title: 'מחיקת רשומה',
+      message: 'האם אתה בטוח שברצונך למחוק רשומה זו?',
+      confirmText: 'מחק',
+      cancelText: 'ביטול',
+      variant: 'danger',
+    })
+    if (confirmed) {
+      await deleteEntry(entryId)
     }
   }
 
@@ -81,7 +102,7 @@ export function EntryTable({ sheetId }: EntryTableProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => deleteEntry(entry.id)}
+                      onClick={() => handleDeleteEntry(entry.id)}
                       className="text-red-500 hover:text-red-600 hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4" />

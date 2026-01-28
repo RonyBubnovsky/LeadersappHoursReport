@@ -6,7 +6,7 @@ import { Clock, Download, Trash2 } from 'lucide-react'
 import { useAuth, useSheets, useEntries } from '@/hooks'
 import { Sidebar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
-import { Button, Card, CardContent } from '@/components/ui'
+import { Button, Card, CardContent, useConfirm } from '@/components/ui'
 import { exportToExcel, exportAllToExcel } from '@/lib/excel'
 import type { Sheet } from '@/types'
 
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null)
   const [showSummary, setShowSummary] = useState(false)
   const { entries } = useEntries(selectedSheet?.id ?? null)
+  const confirm = useConfirm()
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -55,7 +56,14 @@ export default function Dashboard() {
 
   const handleDelete = async () => {
     if (!selectedSheet) return
-    if (confirm('האם אתה בטוח שברצונך למחוק גיליון זה?')) {
+    const confirmed = await confirm({
+      title: 'מחיקת גיליון',
+      message: `האם אתה בטוח שברצונך למחוק את הגיליון "${selectedSheet.name}"? כל הרשומות בגיליון יימחקו גם.`,
+      confirmText: 'מחק גיליון',
+      cancelText: 'ביטול',
+      variant: 'danger',
+    })
+    if (confirmed) {
       await deleteSheet(selectedSheet.id)
       setSelectedSheet(null)
     }
