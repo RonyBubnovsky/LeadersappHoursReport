@@ -43,12 +43,18 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   const [entries, setEntries] = useState<ScheduleEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [hasFetched, setHasFetched] = useState(false)
   const { user } = useAuth()
   const supabase = createClient()
 
-  const fetchEntries = useCallback(async () => {
+  const fetchEntries = useCallback(async (force = false) => {
     if (!user) {
       setLoading(false)
+      return
+    }
+    
+    // Skip if already fetched (unless forced)
+    if (hasFetched && !force) {
       return
     }
     
@@ -64,15 +70,16 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
       setError(error.message)
     } else {
       setEntries(data || [])
+      setHasFetched(true)
     }
     setLoading(false)
-  }, [supabase, user])
+  }, [supabase, user, hasFetched])
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasFetched) {
       fetchEntries()
     }
-  }, [fetchEntries, user])
+  }, [user, hasFetched, fetchEntries])
 
   const updateEntry = async (dayIndex: number, timeSlot: number, content: string) => {
     if (!user) throw new Error('Not authenticated')
@@ -131,7 +138,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ScheduleContext.Provider value={{ entries, loading, error, updateEntry, getEntry, refetch: fetchEntries }}>
+    <ScheduleContext.Provider value={{ entries, loading, error, updateEntry, getEntry, refetch: () => fetchEntries(true) }}>
       {children}
     </ScheduleContext.Provider>
   )
