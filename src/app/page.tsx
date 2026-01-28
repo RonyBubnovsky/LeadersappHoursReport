@@ -26,8 +26,8 @@ export default function Dashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="text-slate-400">טוען...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-500">טוען...</div>
       </div>
     )
   }
@@ -62,7 +62,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <Sidebar
         selectedSheet={selectedSheet}
@@ -77,14 +77,14 @@ export default function Dashboard() {
           {/* Header */}
           <header className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-sky-500 to-violet-500">
+              <div className="p-2 rounded-xl bg-blue-600">
                 <Clock className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">
-                  {showSummary ? 'סיכום כללי' : selectedSheet?.name || 'מערכת ניהול שעות'}
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {showSummary ? 'סיכום כללי' : selectedSheet?.name || 'דיווח שעות LeadersApp'}
                 </h1>
-                <p className="text-slate-400 text-sm">ניהול שעות עבודה ותשלומים</p>
+                <p className="text-gray-500 text-sm">ניהול שעות עבודה ותשלומים</p>
               </div>
             </div>
             
@@ -97,16 +97,16 @@ export default function Dashboard() {
                 </Button>
               )}
               {selectedSheet && entries.length > 0 && (
-                <>
-                  <Button onClick={handleExport} variant="secondary">
-                    <Download className="w-4 h-4" />
-                    ייצא
-                  </Button>
-                  <Button onClick={handleDelete} variant="danger">
-                    <Trash2 className="w-4 h-4" />
-                    מחק
-                  </Button>
-                </>
+                <Button onClick={handleExport} variant="secondary">
+                  <Download className="w-4 h-4" />
+                  ייצא
+                </Button>
+              )}
+              {selectedSheet && (
+                <Button onClick={handleDelete} variant="danger">
+                  <Trash2 className="w-4 h-4" />
+                  מחק
+                </Button>
               )}
             </div>
           </header>
@@ -138,9 +138,9 @@ function SummaryView({ sheets }: { sheets: Sheet[] }) {
   return (
     <Card variant="bordered">
       <CardContent className="p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">סיכום כל הגיליונות</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">סיכום כל הגיליונות</h2>
         {sheets.length === 0 ? (
-          <p className="text-slate-400">אין גיליונות להצגה</p>
+          <p className="text-gray-500">אין גיליונות להצגה</p>
         ) : (
           <div className="space-y-2">
             {sheets.map(sheet => (
@@ -156,11 +156,11 @@ function SummaryView({ sheets }: { sheets: Sheet[] }) {
 function SheetSummaryRow({ sheet }: { sheet: Sheet }) {
   const { entries, totalPayHours } = useEntries(sheet.id)
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50">
-      <span className="text-white">{sheet.name}</span>
+    <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
+      <span className="text-gray-900">{sheet.name}</span>
       <div className="flex gap-4 text-sm">
-        <span className="text-slate-400">{entries.length} רשומות</span>
-        <span className="text-sky-400 font-medium">{totalPayHours.toFixed(2)} שעות</span>
+        <span className="text-gray-500">{entries.length} רשומות</span>
+        <span className="text-blue-600 font-medium">{totalPayHours.toFixed(2)} שעות</span>
       </div>
     </div>
   )
@@ -168,13 +168,13 @@ function SheetSummaryRow({ sheet }: { sheet: Sheet }) {
 
 function WelcomeView() {
   return (
-    <Card variant="glass" className="text-center py-16">
+    <Card variant="bordered" className="text-center py-16">
       <CardContent>
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-sky-500/20 to-violet-500/20 mb-6">
-          <Clock className="w-10 h-10 text-sky-400" />
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-blue-50 mb-6">
+          <Clock className="w-10 h-10 text-blue-600" />
         </div>
-        <h2 className="text-xl font-semibold text-white mb-2">ברוכים הבאים!</h2>
-        <p className="text-slate-400 max-w-md mx-auto">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">ברוכים הבאים!</h2>
+        <p className="text-gray-500 max-w-md mx-auto">
           צור גיליון חדש מהתפריט כדי להתחיל לנהל את שעות העבודה שלך
         </p>
       </CardContent>

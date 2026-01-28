@@ -22,29 +22,23 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
-      </div>
-
-      <Card variant="glass" className="w-full max-w-md relative">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+      <Card variant="bordered" className="w-full max-w-md">
         <CardContent className="space-y-8 p-8">
           {/* Logo & Title */}
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-violet-500 shadow-lg shadow-sky-500/25">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600">
               <Clock className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">מערכת ניהול שעות</h1>
-              <p className="text-slate-400 mt-2">התחבר כדי לנהל את שעות העבודה שלך</p>
+              <h1 className="text-2xl font-bold text-gray-900">דיווח שעות LeadersApp</h1>
+              <p className="text-gray-500 mt-2">התחבר כדי לנהל את שעות העבודה שלך</p>
             </div>
           </div>
 
           {/* Error message */}
           {error && (
-            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+            <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm text-center">
               {error}
             </div>
           )}
@@ -78,7 +72,7 @@ export default function LoginPage() {
           </Button>
 
           {/* Footer */}
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-sm text-gray-400">
             הנתונים שלך מאובטחים ונשמרים בענן
           </p>
         </CardContent>

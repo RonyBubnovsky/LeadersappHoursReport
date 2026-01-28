@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, FileSpreadsheet, ChevronLeft, LogOut, BarChart3 } from 'lucide-react'
+import { Plus, FileSpreadsheet, ChevronRight, LogOut, BarChart3 } from 'lucide-react'
 import { useAuth, useSheets } from '@/hooks'
 import { Button, Input } from '@/components/ui'
 import type { Sheet } from '@/types'
@@ -33,17 +33,17 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
   }
 
   return (
-    <aside className="w-72 h-screen bg-slate-900/50 border-l border-slate-800 flex flex-col">
+    <aside className="w-72 h-screen bg-white border-l border-gray-200 flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-slate-800">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <FileSpreadsheet className="w-5 h-5 text-sky-400" />
+      <div className="p-4 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <FileSpreadsheet className="w-5 h-5 text-blue-600" />
           גיליונות
         </h2>
       </div>
 
       {/* Create new sheet */}
-      <div className="p-4 border-b border-slate-800 space-y-3">
+      <div className="p-4 border-b border-gray-200 space-y-3">
         <Input
           placeholder="שם הגיליון..."
           value={newSheetName}
@@ -65,9 +65,9 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
       {/* Sheets list */}
       <div className="flex-1 overflow-y-auto p-2">
         {loading ? (
-          <div className="p-4 text-center text-slate-500">טוען...</div>
+          <div className="p-4 text-center text-gray-500">טוען...</div>
         ) : sheets.length === 0 ? (
-          <div className="p-4 text-center text-slate-500 text-sm">
+          <div className="p-4 text-center text-gray-500 text-sm">
             עדיין אין גיליונות. צור את הראשון!
           </div>
         ) : (
@@ -78,13 +78,13 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
                 onClick={() => {
                   onSelectSheet(sheet)
                 }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   selectedSheet?.id === sheet.id && !showSummary
-                    ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    ? 'bg-blue-50 text-blue-700 font-medium'
+                    : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4" />
                 <span className="truncate">{sheet.name}</span>
               </button>
             ))}
@@ -93,7 +93,7 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
       </div>
 
       {/* Summary button */}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-gray-200">
         <Button
           onClick={onShowSummary}
           variant={showSummary ? 'primary' : 'secondary'}
@@ -106,8 +106,8 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
       </div>
 
       {/* User info & logout */}
-      <div className="p-4 border-t border-slate-800 flex items-center justify-between">
-        <span className="text-sm text-slate-400 truncate max-w-[140px]">
+      <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+        <span className="text-sm text-gray-500 truncate max-w-[140px]">
           {user?.email}
         </span>
         <Button onClick={signOut} variant="ghost" size="sm">

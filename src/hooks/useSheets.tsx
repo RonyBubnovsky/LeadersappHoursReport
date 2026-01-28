@@ -1,13 +1,21 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Sheet } from '@/types'
 
-/**
- * Hook for managing sheets data.
- */
-export function useSheets() {
+interface SheetsContextType {
+  sheets: Sheet[]
+  loading: boolean
+  error: string | null
+  createSheet: (name: string) => Promise<Sheet>
+  deleteSheet: (id: string) => Promise<void>
+  refetch: () => Promise<void>
+}
+
+const SheetsContext = createContext<SheetsContextType | null>(null)
+
+export function SheetsProvider({ children }: { children: ReactNode }) {
   const [sheets, setSheets] = useState<Sheet[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -59,12 +67,17 @@ export function useSheets() {
     setSheets(prev => prev.filter(s => s.id !== id))
   }
 
-  return {
-    sheets,
-    loading,
-    error,
-    createSheet,
-    deleteSheet,
-    refetch: fetchSheets,
+  return (
+    <SheetsContext.Provider value={{ sheets, loading, error, createSheet, deleteSheet, refetch: fetchSheets }}>
+      {children}
+    </SheetsContext.Provider>
+  )
+}
+
+export function useSheets() {
+  const context = useContext(SheetsContext)
+  if (!context) {
+    throw new Error('useSheets must be used within a SheetsProvider')
   }
+  return context
 }

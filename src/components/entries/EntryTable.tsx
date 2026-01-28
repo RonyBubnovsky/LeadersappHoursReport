@@ -14,7 +14,7 @@ export function EntryTable({ sheetId }: EntryTableProps) {
   if (loading) {
     return (
       <Card variant="bordered">
-        <CardContent className="p-8 text-center text-slate-500">
+        <CardContent className="p-8 text-center text-gray-500">
           טוען נתונים...
         </CardContent>
       </Card>
@@ -24,7 +24,7 @@ export function EntryTable({ sheetId }: EntryTableProps) {
   if (entries.length === 0) {
     return (
       <Card variant="bordered">
-        <CardContent className="p-8 text-center text-slate-500">
+        <CardContent className="p-8 text-center text-gray-500">
           אין רשומות עדיין. הוסף את הראשונה למעלה.
         </CardContent>
       </Card>
@@ -35,21 +35,21 @@ export function EntryTable({ sheetId }: EntryTableProps) {
     <Card variant="bordered">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>רשומות</CardTitle>
-        <div className="text-sm text-slate-400">
-          סה״כ שעות לתשלום: <span className="text-sky-400 font-semibold">{totalPayHours.toFixed(2)}</span>
+        <div className="text-sm text-gray-500">
+          סה״כ שעות לתשלום: <span className="text-blue-600 font-semibold">{totalPayHours.toFixed(2)}</span>
         </div>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-700">
-                <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">שם הכיתה</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">תאריך</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">התחלה</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">סיום</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">סה״כ</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-slate-400">לתשלום</th>
+              <tr className="border-b border-gray-200">
+                <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">שם הכיתה</th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">תאריך</th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">התחלה</th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">סיום</th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">סה״כ</th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">לתשלום</th>
                 <th className="py-3 px-4"></th>
               </tr>
             </thead>
@@ -57,20 +57,20 @@ export function EntryTable({ sheetId }: EntryTableProps) {
               {entries.map((entry) => (
                 <tr 
                   key={entry.id} 
-                  className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors"
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                 >
-                  <td className="py-3 px-4 text-white">{entry.class_name}</td>
-                  <td className="py-3 px-4 text-slate-300">{entry.date_str}</td>
-                  <td className="py-3 px-4 text-slate-300">{entry.start_time}</td>
-                  <td className="py-3 px-4 text-slate-300">{entry.end_time}</td>
-                  <td className="py-3 px-4 text-slate-300">{entry.total_hours}</td>
-                  <td className="py-3 px-4 text-sky-400 font-medium">{entry.pay_hours.toFixed(2)}</td>
+                  <td className="py-3 px-4 text-gray-900 text-right">{entry.class_name}</td>
+                  <td className="py-3 px-4 text-gray-600 text-right">{entry.date_str}</td>
+                  <td className="py-3 px-4 text-gray-600 text-right">{entry.start_time}</td>
+                  <td className="py-3 px-4 text-gray-600 text-right">{entry.end_time}</td>
+                  <td className="py-3 px-4 text-gray-600 text-right">{entry.total_hours}</td>
+                  <td className="py-3 px-4 text-blue-600 font-medium text-right">{entry.pay_hours.toFixed(2)}</td>
                   <td className="py-3 px-4">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => deleteEntry(entry.id)}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
