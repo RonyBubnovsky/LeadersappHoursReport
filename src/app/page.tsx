@@ -77,9 +77,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
       <NavBar />
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
       {/* Sidebar */}
       <Sidebar
         selectedSheet={selectedSheet}

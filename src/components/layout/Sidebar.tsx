@@ -56,7 +56,7 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
   }
 
   return (
-    <aside className="w-72 h-screen bg-white border-l border-gray-200 flex flex-col">
+    <aside className="w-72 h-full bg-white border-l border-gray-200 flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
