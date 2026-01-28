@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, FileSpreadsheet, ChevronRight, LogOut, BarChart3 } from 'lucide-react'
+import { Plus, FileSpreadsheet, ChevronRight, BarChart3 } from 'lucide-react'
 import { useAuth, useSheets } from '@/hooks'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, useConfirm } from '@/components/ui'
+import { deleteUserAndData } from '@/services/userService'
 import type { Sheet } from '@/types'
 
 interface SidebarProps {
@@ -18,6 +19,8 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
   const { sheets, loading, createSheet } = useSheets()
   const [newSheetName, setNewSheetName] = useState('')
   const [isCreating, setIsCreating] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const confirm = useConfirm()
 
   const handleCreateSheet = async () => {
     if (!newSheetName.trim()) return
@@ -32,8 +35,28 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
     setIsCreating(false)
   }
 
+  const handleDeleteUser = async () => {
+    if (!user) return
+    const confirmed = await confirm({
+      title: 'מחיקת משתמש',
+      message: 'האם אתה בטוח שברצונך למחוק את החשבון? כל הנתונים שלך יימחקו לצמיתות.',
+      confirmText: 'מחק חשבון',
+      cancelText: 'ביטול',
+      variant: 'danger',
+    })
+    if (confirmed) {
+      setIsDeleting(true)
+      try {
+        await deleteUserAndData(user.id)
+      } catch (error) {
+        console.error('Failed to delete user:', error)
+        setIsDeleting(false)
+      }
+    }
+  }
+
   return (
-    <aside className="w-72 h-screen bg-white border-l border-gray-200 flex flex-col">
+    <aside className="w-72 h-full bg-white border-l border-gray-200 flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -105,9 +128,9 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
         </Button>
       </div>
 
-      {/* User info & logout */}
-      <div className="p-4 border-t border-gray-200 flex items-center justify-between">
-        <div className="flex items-center gap-3 min-w-0">
+      {/* User info & actions */}
+      <div className="p-4 border-t border-gray-200">
+        <div className="flex items-center gap-3 mb-3">
           {user?.user_metadata?.avatar_url && (
             <img 
               src={user.user_metadata.avatar_url} 
@@ -119,9 +142,20 @@ export function Sidebar({ selectedSheet, onSelectSheet, onShowSummary, showSumma
             {user?.user_metadata?.full_name || user?.email}
           </span>
         </div>
-        <Button onClick={signOut} variant="ghost" size="sm">
-          <LogOut className="w-4 h-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={signOut} variant="secondary" size="sm" className="flex-1">
+            התנתק
+          </Button>
+          <Button 
+            onClick={handleDeleteUser} 
+            variant="danger" 
+            size="sm" 
+            className="flex-1"
+            isLoading={isDeleting}
+          >
+            מחק משתמש
+          </Button>
+        </div>
       </div>
     </aside>
   )

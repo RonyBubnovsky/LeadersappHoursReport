@@ -40,8 +40,8 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
       .from('entries')
       .select('*')
       .eq('sheet_id', sheetId)
-      .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
+      .order('created_at', { ascending: true })
+      .then(({ data, error }: { data: Entry[] | null, error: unknown }) => {
         if (!error && data) {
           setEntriesBySheet(prev => ({ ...prev, [sheetId]: data }))
         }
@@ -86,7 +86,7 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
     
     setEntriesBySheet(prev => ({
       ...prev,
-      [input.sheet_id]: [data, ...(prev[input.sheet_id] || [])]
+      [input.sheet_id]: [...(prev[input.sheet_id] || []), data]
     }))
     
     return data

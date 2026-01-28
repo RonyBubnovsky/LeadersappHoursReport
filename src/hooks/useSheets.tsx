@@ -28,7 +28,7 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase
       .from('sheets')
       .select('*')
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: true })
 
     if (error) {
       setError(error.message)
@@ -53,7 +53,7 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
       .single()
 
     if (error) throw error
-    setSheets(prev => [data, ...prev])
+    setSheets(prev => [...prev, data])
     return data
   }
 

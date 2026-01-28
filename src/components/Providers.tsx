@@ -1,18 +1,23 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { SheetsProvider, EntriesProvider } from '@/hooks'
-import { ConfirmProvider } from '@/components/ui'
+import { AuthProvider, SheetsProvider, EntriesProvider, ScheduleProvider } from '@/hooks'
+import { ConfirmProvider, InputDialogProvider } from '@/components/ui'
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ConfirmProvider>
-      <SheetsProvider>
-        <EntriesProvider>
-          {children}
-        </EntriesProvider>
-      </SheetsProvider>
-    </ConfirmProvider>
+    <AuthProvider>
+      <ConfirmProvider>
+        <InputDialogProvider>
+          <SheetsProvider>
+            <EntriesProvider>
+              <ScheduleProvider>
+                {children}
+              </ScheduleProvider>
+            </EntriesProvider>
+          </SheetsProvider>
+        </InputDialogProvider>
+      </ConfirmProvider>
+    </AuthProvider>
   )
 }
-

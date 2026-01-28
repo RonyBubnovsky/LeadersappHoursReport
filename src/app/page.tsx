@@ -1,29 +1,31 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Clock, Download, Trash2 } from 'lucide-react'
 import { useAuth, useSheets, useEntries } from '@/hooks'
-import { Sidebar } from '@/components/layout'
+import { Sidebar, NavBar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
-import { Button, Card, CardContent, useConfirm, LoadingScreen } from '@/components/ui'
+import { Button, Card, CardContent, useConfirm, useInputDialog, LoadingScreen } from '@/components/ui'
 import { exportToExcel, exportAllToExcel } from '@/lib/excel'
 import type { Sheet } from '@/types'
 
 export default function Dashboard() {
+  const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const { sheets, deleteSheet } = useSheets()
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null)
   const [showSummary, setShowSummary] = useState(false)
   const { entries } = useEntries(selectedSheet?.id ?? null)
   const confirm = useConfirm()
+  const promptInput = useInputDialog()
 
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
-      redirect('/login')
+      router.push('/login')
     }
-  }, [user, authLoading])
+  }, [user, authLoading, router])
 
   if (authLoading) {
     return <LoadingScreen />
@@ -47,7 +49,17 @@ export default function Dashboard() {
   }
 
   const handleExportAll = async () => {
-    await exportAllToExcel(sheets)
+    const filename = await promptInput({
+      title: 'שם הקובץ',
+      message: 'הזן שם לקובץ האקסל',
+      placeholder: 'דוח_שעות',
+      defaultValue: 'דוח_מלא',
+      confirmText: 'ייצא',
+      cancelText: 'ביטול',
+    })
+    if (filename) {
+      await exportAllToExcel(sheets, filename)
+    }
   }
 
   const handleDelete = async () => {
@@ -66,7 +78,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+      <NavBar />
+      <div className="flex flex-1 min-h-0">
       {/* Sidebar */}
       <Sidebar
         selectedSheet={selectedSheet}
@@ -125,6 +139,7 @@ export default function Dashboard() {
           )}
         </div>
       </main>
+      </div>
     </div>
   )
 }
