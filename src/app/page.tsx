@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Clock, Download, Trash2 } from 'lucide-react'
 import { useAuth, useSheets, useEntries } from '@/hooks'
 import { Sidebar, NavBar } from '@/components/layout'
@@ -11,6 +11,7 @@ import { exportToExcel, exportAllToExcel } from '@/lib/excel'
 import type { Sheet } from '@/types'
 
 export default function Dashboard() {
+  const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const { sheets, deleteSheet } = useSheets()
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null)
@@ -22,9 +23,9 @@ export default function Dashboard() {
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
-      redirect('/login')
+      router.push('/login')
     }
-  }, [user, authLoading])
+  }, [user, authLoading, router])
 
   if (authLoading) {
     return <LoadingScreen />

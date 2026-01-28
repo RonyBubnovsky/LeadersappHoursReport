@@ -41,7 +41,7 @@ export const DAYS = ['יום א׳', 'יום ב׳', 'יום ג׳', 'יום ד׳',
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
   const [entries, setEntries] = useState<ScheduleEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasFetched, setHasFetched] = useState(false)
   const { user } = useAuth()
@@ -75,11 +75,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     setLoading(false)
   }, [supabase, user, hasFetched])
 
-  useEffect(() => {
-    if (user && !hasFetched) {
-      fetchEntries()
-    }
-  }, [user, hasFetched, fetchEntries])
+  // Don't auto-fetch on mount - let the schedule page trigger the fetch
 
   const updateEntry = async (dayIndex: number, timeSlot: number, content: string) => {
     if (!user) throw new Error('Not authenticated')
@@ -138,7 +134,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ScheduleContext.Provider value={{ entries, loading, error, updateEntry, getEntry, refetch: () => fetchEntries(true) }}>
+    <ScheduleContext.Provider value={{ entries, loading, error, updateEntry, getEntry, refetch: fetchEntries }}>
       {children}
     </ScheduleContext.Provider>
   )

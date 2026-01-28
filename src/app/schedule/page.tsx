@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Calendar } from 'lucide-react'
 import { useAuth } from '@/hooks'
 import { NavBar } from '@/components/layout'
@@ -9,13 +9,14 @@ import { ScheduleTable } from '@/components/schedule'
 import { LoadingScreen } from '@/components/ui'
 
 export default function SchedulePage() {
+  const router = useRouter()
   const { user, loading: authLoading } = useAuth()
 
   useEffect(() => {
     if (!authLoading && !user) {
-      redirect('/login')
+      router.push('/login')
     }
-  }, [user, authLoading])
+  }, [user, authLoading, router])
 
   if (authLoading) {
     return <LoadingScreen />
