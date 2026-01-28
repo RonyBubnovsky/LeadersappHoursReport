@@ -25,6 +25,14 @@ export async function deleteUserAndData(userId: string): Promise<void> {
     if (isDev) console.log(`✓ Deleted ${sheets.length} sheets and their entries`)
   }
 
+  // Delete all schedule entries for this user
+  await supabase
+    .from('schedule_entries')
+    .delete()
+    .eq('user_id', userId)
+  
+  if (isDev) console.log('✓ Deleted schedule entries')
+
   // Delete all sheets
   await supabase
     .from('sheets')

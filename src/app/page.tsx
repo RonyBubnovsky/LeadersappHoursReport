@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { redirect } from 'next/navigation'
 import { Clock, Download, Trash2 } from 'lucide-react'
 import { useAuth, useSheets, useEntries } from '@/hooks'
-import { Sidebar } from '@/components/layout'
+import { Sidebar, NavBar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
 import { Button, Card, CardContent, useConfirm, useInputDialog, LoadingScreen } from '@/components/ui'
 import { exportToExcel, exportAllToExcel } from '@/lib/excel'
@@ -77,7 +77,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <NavBar />
+      <div className="flex flex-1">
       {/* Sidebar */}
       <Sidebar
         selectedSheet={selectedSheet}
@@ -136,6 +138,7 @@ export default function Dashboard() {
           )}
         </div>
       </main>
+      </div>
     </div>
   )
 }

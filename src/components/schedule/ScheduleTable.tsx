@@ -1,0 +1,126 @@
+'use client'
+
+import { useState, useCallback } from 'react'
+import { useSchedule, TIME_SLOTS, DAYS } from '@/hooks'
+
+interface EditableCell {
+  dayIndex: number
+  timeSlot: number
+}
+
+export function ScheduleTable() {
+  const { loading, error, updateEntry, getEntry } = useSchedule()
+  const [editingCell, setEditingCell] = useState<EditableCell | null>(null)
+  const [editValue, setEditValue] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const handleCellClick = (dayIndex: number, timeSlot: number) => {
+    const currentValue = getEntry(dayIndex, timeSlot)
+    setEditValue(currentValue)
+    setEditingCell({ dayIndex, timeSlot })
+  }
+
+  const handleSave = useCallback(async () => {
+    if (!editingCell) return
+    
+    setSaving(true)
+    try {
+      await updateEntry(editingCell.dayIndex, editingCell.timeSlot, editValue)
+    } catch (err) {
+      console.error('Failed to save:', err)
+    }
+    setSaving(false)
+    setEditingCell(null)
+  }, [editingCell, editValue, updateEntry])
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave()
+    } else if (e.key === 'Escape') {
+      setEditingCell(null)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-gray-500">טוען מערכת שעות...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-red-500">שגיאה: {error}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse bg-white rounded-xl shadow-sm overflow-hidden">
+        <thead>
+          <tr className="bg-gray-50">
+            <th className="border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-600 w-28">
+              {/* Empty header for time column */}
+            </th>
+            {DAYS.map((day, index) => (
+              <th
+                key={index}
+                className="border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900 min-w-[140px]"
+              >
+                {day}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {TIME_SLOTS.map((timeSlot, timeIndex) => (
+            <tr key={timeIndex} className="hover:bg-gray-50/50 transition-colors">
+              <td className="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-600 bg-gray-50 text-center">
+                {timeSlot}
+              </td>
+              {DAYS.map((_, dayIndex) => {
+                const isEditing =
+                  editingCell?.dayIndex === dayIndex &&
+                  editingCell?.timeSlot === timeIndex
+                const cellValue = getEntry(dayIndex, timeIndex)
+
+                return (
+                  <td
+                    key={dayIndex}
+                    className={`border border-gray-200 px-2 py-1 text-sm transition-colors cursor-pointer ${
+                      isEditing ? 'bg-blue-50' : cellValue ? 'bg-white' : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => !isEditing && handleCellClick(dayIndex, timeIndex)}
+                  >
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onBlur={handleSave}
+                        onKeyDown={handleKeyDown}
+                        autoFocus
+                        disabled={saving}
+                        className="w-full px-2 py-1.5 text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        placeholder="הזן תוכן..."
+                      />
+                    ) : (
+                      <div className="min-h-[36px] px-2 py-1.5 flex items-center">
+                        {cellValue || (
+                          <span className="text-gray-300 text-xs">לחץ לעריכה</span>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
