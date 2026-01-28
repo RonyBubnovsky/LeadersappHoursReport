@@ -67,14 +67,16 @@ export function EntryForm({ sheetId }: EntryFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="שעת התחלה"
-              type="time"
+              placeholder="לדוגמה: 08:00"
+              pattern="^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
               value={formData.start_time}
               onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
               required
             />
             <Input
               label="שעת סיום"
-              type="time"
+              placeholder="לדוגמה: 09:00"
+              pattern="^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
               value={formData.end_time}
               onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
               required
