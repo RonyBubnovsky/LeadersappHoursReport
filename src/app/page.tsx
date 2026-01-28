@@ -6,7 +6,7 @@ import { Clock, Download, Trash2 } from 'lucide-react'
 import { useAuth, useSheets, useEntries } from '@/hooks'
 import { Sidebar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
-import { Button, Card, CardContent, useConfirm, LoadingScreen } from '@/components/ui'
+import { Button, Card, CardContent, useConfirm, useInputDialog, LoadingScreen } from '@/components/ui'
 import { exportToExcel, exportAllToExcel } from '@/lib/excel'
 import type { Sheet } from '@/types'
 
@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [showSummary, setShowSummary] = useState(false)
   const { entries } = useEntries(selectedSheet?.id ?? null)
   const confirm = useConfirm()
+  const promptInput = useInputDialog()
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -47,7 +48,17 @@ export default function Dashboard() {
   }
 
   const handleExportAll = async () => {
-    await exportAllToExcel(sheets)
+    const filename = await promptInput({
+      title: 'שם הקובץ',
+      message: 'הזן שם לקובץ האקסל',
+      placeholder: 'דוח_שעות',
+      defaultValue: 'דוח_מלא',
+      confirmText: 'ייצא',
+      cancelText: 'ביטול',
+    })
+    if (filename) {
+      await exportAllToExcel(sheets, filename)
+    }
   }
 
   const handleDelete = async () => {
