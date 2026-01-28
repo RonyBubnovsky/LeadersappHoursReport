@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks'
-import { Button, Card, CardContent } from '@/components/ui'
+import { Button, Card, CardContent, LoadingScreen } from '@/components/ui'
 import { Clock } from 'lucide-react'
 
 export default function LoginPage() {
@@ -32,16 +32,7 @@ export default function LoginPage() {
 
   // Show loading while checking auth status
   if (authLoading || user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 animate-pulse">
-            <Clock className="w-8 h-8 text-white" />
-          </div>
-          <p className="text-gray-500">טוען...</p>
-        </div>
-      </div>
-    )
+    return <LoadingScreen />
   }
 
   return (
