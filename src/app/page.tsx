@@ -6,7 +6,7 @@ import { Clock, Download, Trash2 } from 'lucide-react'
 import { useAuth, useSheets, useEntries } from '@/hooks'
 import { Sidebar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
-import { Button, Card, CardContent, useConfirm } from '@/components/ui'
+import { Button, Card, CardContent, useConfirm, LoadingScreen } from '@/components/ui'
 import { exportToExcel, exportAllToExcel } from '@/lib/excel'
 import type { Sheet } from '@/types'
 
@@ -26,11 +26,7 @@ export default function Dashboard() {
   }, [user, authLoading])
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500">טוען...</div>
-      </div>
-    )
+    return <LoadingScreen />
   }
 
   if (!user) return null
