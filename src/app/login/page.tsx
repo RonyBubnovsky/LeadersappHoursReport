@@ -1,14 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks'
 import { Button, Card, CardContent } from '@/components/ui'
 import { Clock } from 'lucide-react'
 
 export default function LoginPage() {
-  const { signInWithGoogle } = useAuth()
+  const router = useRouter()
+  const { user, loading: authLoading, signInWithGoogle } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace('/')
+    }
+  }, [user, authLoading, router])
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
@@ -19,6 +28,20 @@ export default function LoginPage() {
       setError('שגיאה בהתחברות. נסה שוב.')
       setLoading(false)
     }
+  }
+
+  // Show loading while checking auth status
+  if (authLoading || user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 animate-pulse">
+            <Clock className="w-8 h-8 text-white" />
+          </div>
+          <p className="text-gray-500">טוען...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
