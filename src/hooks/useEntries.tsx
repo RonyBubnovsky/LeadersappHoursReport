@@ -41,7 +41,7 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
       .select('*')
       .eq('sheet_id', sheetId)
       .order('created_at', { ascending: true })
-      .then(({ data, error }) => {
+      .then(({ data, error }: { data: Entry[] | null, error: unknown }) => {
         if (!error && data) {
           setEntriesBySheet(prev => ({ ...prev, [sheetId]: data }))
         }

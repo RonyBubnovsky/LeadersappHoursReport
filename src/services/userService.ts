@@ -13,7 +13,7 @@ export async function deleteUserAndData(userId: string): Promise<void> {
   const { data: sheets } = await supabase
     .from('sheets')
     .select('id')
-    .eq('user_id', userId)
+    .eq('user_id', userId) as { data: { id: string }[] | null }
 
   if (sheets && sheets.length > 0) {
     const sheetIds = sheets.map(s => s.id)

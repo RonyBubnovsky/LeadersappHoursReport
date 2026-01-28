@@ -75,7 +75,7 @@ export async function exportAllToExcel(sheets: Sheet[], filename?: string): Prom
       .from('entries')
       .select('*')
       .eq('sheet_id', sheet.id)
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: true }) as { data: Entry[] | null }
 
     if (!entries || entries.length === 0) continue
 
