@@ -50,6 +50,12 @@ body {
   transform: translateX(0);
 }
 
+/* Hide sidebar without animation on initial load (before user interaction) */
+.sidebar-mobile.no-animation {
+  transform: translateX(100%);
+  transition: none;
+}
+
 /* Ensure minimum touch target size */
 @media (max-width: 767px) {
   button,

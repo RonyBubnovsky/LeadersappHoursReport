@@ -50,3 +50,15 @@ export interface User {
     avatar_url?: string
   }
 }
+
+// Saved export metadata from Supabase
+export interface SavedExport {
+  id: string
+  user_id: string
+  file_name: string
+  file_path: string
+  file_size: number | null
+  sheets_count: number
+  total_hours: number
+  created_at: string
+}

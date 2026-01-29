@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const MOBILE_BREAKPOINT = 768
 
@@ -27,6 +27,8 @@ export function useMobile(): boolean {
 export function useSidebarState() {
   const isMobile = useMobile()
   const [isOpen, setIsOpen] = useState(false)
+  // Track if user has interacted - prevents closing animation on initial load
+  const hasInteracted = useRef(false)
 
   // Close sidebar when switching to desktop
   useEffect(() => {
@@ -35,13 +37,23 @@ export function useSidebarState() {
     }
   }, [isMobile])
 
-  const toggle = () => setIsOpen(prev => !prev)
-  const open = () => setIsOpen(true)
-  const close = () => setIsOpen(false)
+  const toggle = () => {
+    hasInteracted.current = true
+    setIsOpen(prev => !prev)
+  }
+  const open = () => {
+    hasInteracted.current = true
+    setIsOpen(true)
+  }
+  const close = () => {
+    hasInteracted.current = true
+    setIsOpen(false)
+  }
 
   return {
     isMobile,
     isOpen,
+    hasInteracted: hasInteracted.current,
     toggle,
     open,
     close,

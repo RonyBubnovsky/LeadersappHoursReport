@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Clock, Download, Trash2, Menu } from 'lucide-react'
-import { useAuth, useSheets, useEntries, useSidebarState } from '@/hooks'
+import { useAuth, useSheets, useEntries, useSidebarState, useSavedExports } from '@/hooks'
 import { Sidebar, NavBar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
 import { Button, Card, CardContent, useConfirm, useInputDialog, LoadingScreen } from '@/components/ui'
@@ -14,6 +14,7 @@ export default function Dashboard() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const { sheets, deleteSheet } = useSheets()
+  const { addExport } = useSavedExports()
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null)
   const [showSummary, setShowSummary] = useState(false)
   const { entries } = useEntries(selectedSheet?.id ?? null)
@@ -61,7 +62,11 @@ export default function Dashboard() {
       cancelText: 'ביטול',
     })
     if (filename) {
-      await exportAllToExcel(sheets, filename)
+      await exportAllToExcel(sheets, filename, {
+        saveToCloud: true,
+        userId: user?.id,
+        onSuccess: addExport
+      })
     }
   }
 
@@ -86,22 +91,27 @@ export default function Dashboard() {
       <div className="flex flex-1 min-h-0">
         {/* Sidebar - hidden on mobile, shown as drawer when toggled */}
         {isMobile ? (
-          <Sidebar
-            selectedSheet={selectedSheet}
-            onSelectSheet={handleSelectSheet}
-            onShowSummary={handleShowSummary}
-            showSummary={showSummary}
-            isMobile={true}
-            isOpen={sidebarOpen}
-            onClose={closeSidebar}
-          />
+          // Only render mobile sidebar when it's open
+          sidebarOpen && (
+            <Sidebar
+              selectedSheet={selectedSheet}
+              onSelectSheet={handleSelectSheet}
+              onShowSummary={handleShowSummary}
+              showSummary={showSummary}
+              isMobile={true}
+              isOpen={sidebarOpen}
+              onClose={closeSidebar}
+            />
+          )
         ) : (
-          <Sidebar
-            selectedSheet={selectedSheet}
-            onSelectSheet={handleSelectSheet}
-            onShowSummary={handleShowSummary}
-            showSummary={showSummary}
-          />
+          <div className="hidden md:flex h-full">
+            <Sidebar
+              selectedSheet={selectedSheet}
+              onSelectSheet={handleSelectSheet}
+              onShowSummary={handleShowSummary}
+              showSummary={showSummary}
+            />
+          </div>
         )}
 
         {/* Main content */}
