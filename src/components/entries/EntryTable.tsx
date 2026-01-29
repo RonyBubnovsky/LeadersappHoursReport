@@ -64,12 +64,12 @@ export function EntryTable({ sheetId }: EntryTableProps) {
 
   return (
     <Card variant="bordered">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           <CardTitle>רשומות</CardTitle>
           <Button onClick={handleDeleteAll} variant="danger" size="sm">
             <Trash2 className="w-4 h-4" />
-            מחק הכל
+            <span className="hidden sm:inline">מחק הכל</span>
           </Button>
         </div>
         <div className="text-sm text-gray-500">
@@ -77,7 +77,8 @@ export function EntryTable({ sheetId }: EntryTableProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
+        {/* Desktop Table View - hidden on mobile */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
@@ -127,6 +128,58 @@ export function EntryTable({ sheetId }: EntryTableProps) {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card View - hidden on desktop */}
+        <div className="md:hidden space-y-3">
+          {entries.map((entry) => (
+            <div 
+              key={entry.id} 
+              className="bg-gray-50 rounded-lg p-4 border border-gray-100"
+            >
+              {/* Entry header with name and actions */}
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <div className="font-medium text-gray-900">{entry.class_name}</div>
+                  <div className="text-sm text-gray-500">{entry.date_str}</div>
+                </div>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditingEntry(entry)}
+                    className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 p-2"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteEntry(entry.id)}
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50 p-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Entry details grid */}
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="text-gray-500">שעות: </span>
+                  <span className="text-gray-700">{entry.start_time} - {entry.end_time}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">סה״כ: </span>
+                  <span className="text-gray-700">{entry.total_hours}</span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-500">לתשלום: </span>
+                  <span className="text-blue-600 font-semibold">{entry.pay_hours.toFixed(2)} שעות</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </CardContent>
 
       {editingEntry && (
@@ -142,3 +195,4 @@ export function EntryTable({ sheetId }: EntryTableProps) {
     </Card>
   )
 }
+

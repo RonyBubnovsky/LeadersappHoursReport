@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Clock, Download, Trash2 } from 'lucide-react'
-import { useAuth, useSheets, useEntries } from '@/hooks'
+import { Clock, Download, Trash2, Menu } from 'lucide-react'
+import { useAuth, useSheets, useEntries, useSidebarState } from '@/hooks'
 import { Sidebar, NavBar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
 import { Button, Card, CardContent, useConfirm, useInputDialog, LoadingScreen } from '@/components/ui'
@@ -19,6 +19,9 @@ export default function Dashboard() {
   const { entries } = useEntries(selectedSheet?.id ?? null)
   const confirm = useConfirm()
   const promptInput = useInputDialog()
+  
+  // Mobile sidebar state
+  const { isMobile, isOpen: sidebarOpen, toggle: toggleSidebar, close: closeSidebar } = useSidebarState()
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -81,64 +84,91 @@ export default function Dashboard() {
     <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
       <NavBar />
       <div className="flex flex-1 min-h-0">
-      {/* Sidebar */}
-      <Sidebar
-        selectedSheet={selectedSheet}
-        onSelectSheet={handleSelectSheet}
-        onShowSummary={handleShowSummary}
-        showSummary={showSummary}
-      />
+        {/* Sidebar - hidden on mobile, shown as drawer when toggled */}
+        {isMobile ? (
+          <Sidebar
+            selectedSheet={selectedSheet}
+            onSelectSheet={handleSelectSheet}
+            onShowSummary={handleShowSummary}
+            showSummary={showSummary}
+            isMobile={true}
+            isOpen={sidebarOpen}
+            onClose={closeSidebar}
+          />
+        ) : (
+          <Sidebar
+            selectedSheet={selectedSheet}
+            onSelectSheet={handleSelectSheet}
+            onShowSummary={handleShowSummary}
+            showSummary={showSummary}
+          />
+        )}
 
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-8 max-w-5xl mx-auto">
-          {/* Header */}
-          <header className="mb-8 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-blue-600">
-                <Clock className="w-6 h-6 text-white" />
+        {/* Main content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-8 max-w-5xl mx-auto">
+            {/* Header - responsive layout */}
+            <header className="mb-6 md:mb-8">
+              {/* Top row with hamburger, title */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  {/* Hamburger menu button - only on mobile */}
+                  {isMobile && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={toggleSidebar}
+                      className="p-2"
+                    >
+                      <Menu className="w-6 h-6" />
+                    </Button>
+                  )}
+                  <div className="p-2 rounded-xl bg-blue-600">
+                    <Clock className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-lg md:text-2xl font-bold text-gray-900 line-clamp-1">
+                      {showSummary ? 'סיכום כללי' : selectedSheet?.name || 'דיווח שעות'}
+                    </h1>
+                    <p className="text-gray-500 text-xs md:text-sm hidden sm:block">ניהול שעות עבודה ותשלומים</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {showSummary ? 'סיכום כללי' : selectedSheet?.name || 'דיווח שעות LeadersApp'}
-                </h1>
-                <p className="text-gray-500 text-sm">ניהול שעות עבודה ותשלומים</p>
+              
+              {/* Actions row - responsive */}
+              <div className="flex flex-wrap gap-2">
+                {showSummary && sheets.length > 0 && (
+                  <Button onClick={handleExportAll} variant="secondary" size="sm">
+                    <Download className="w-4 h-4" />
+                    <span className="hidden sm:inline">ייצא הכל</span>
+                    <span className="sm:hidden">ייצא</span>
+                  </Button>
+                )}
+                {selectedSheet && entries.length > 0 && (
+                  <Button onClick={handleExport} variant="secondary" size="sm">
+                    <Download className="w-4 h-4" />
+                    ייצא
+                  </Button>
+                )}
+                {selectedSheet && (
+                  <Button onClick={handleDelete} variant="danger" size="sm">
+                    <Trash2 className="w-4 h-4" />
+                    <span className="hidden sm:inline">מחק</span>
+                  </Button>
+                )}
               </div>
-            </div>
-            
-            {/* Actions */}
-            <div className="flex gap-2">
-              {showSummary && sheets.length > 0 && (
-                <Button onClick={handleExportAll} variant="secondary">
-                  <Download className="w-4 h-4" />
-                  ייצא הכל
-                </Button>
-              )}
-              {selectedSheet && entries.length > 0 && (
-                <Button onClick={handleExport} variant="secondary">
-                  <Download className="w-4 h-4" />
-                  ייצא
-                </Button>
-              )}
-              {selectedSheet && (
-                <Button onClick={handleDelete} variant="danger">
-                  <Trash2 className="w-4 h-4" />
-                  מחק
-                </Button>
-              )}
-            </div>
-          </header>
+            </header>
 
-          {/* Content */}
-          {showSummary ? (
-            <SummaryView sheets={sheets} />
-          ) : selectedSheet ? (
-            <SheetView sheetId={selectedSheet.id} />
-          ) : (
-            <WelcomeView />
-          )}
-        </div>
-      </main>
+            {/* Content */}
+            {showSummary ? (
+              <SummaryView sheets={sheets} />
+            ) : selectedSheet ? (
+              <SheetView sheetId={selectedSheet.id} />
+            ) : (
+              <WelcomeView onOpenSidebar={isMobile ? toggleSidebar : undefined} />
+            )}
+          </div>
+        </main>
       </div>
     </div>
   )
@@ -175,8 +205,8 @@ function SummaryView({ sheets }: { sheets: Sheet[] }) {
 function SheetSummaryRow({ sheet }: { sheet: Sheet }) {
   const { entries, totalPayHours } = useEntries(sheet.id)
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-100">
-      <span className="text-gray-900">{sheet.name}</span>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg bg-gray-50 border border-gray-100 gap-2">
+      <span className="text-gray-900 font-medium">{sheet.name}</span>
       <div className="flex gap-4 text-sm">
         <span className="text-gray-500">{entries.length} רשומות</span>
         <span className="text-blue-600 font-medium">{totalPayHours.toFixed(2)} שעות</span>
@@ -185,16 +215,22 @@ function SheetSummaryRow({ sheet }: { sheet: Sheet }) {
   )
 }
 
-function WelcomeView() {
+function WelcomeView({ onOpenSidebar }: { onOpenSidebar?: () => void }) {
   return (
-    <Card variant="bordered" className="text-center py-16">
+    <Card variant="bordered" className="text-center py-12 md:py-16">
       <CardContent>
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-blue-50 mb-6">
-          <Clock className="w-10 h-10 text-blue-600" />
+        <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-blue-50 mb-6">
+          <Clock className="w-8 h-8 md:w-10 md:h-10 text-blue-600" />
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">ברוכים הבאים!</h2>
-        <p className="text-gray-500 max-w-md mx-auto">
-          צור גיליון חדש מהתפריט כדי להתחיל לנהל את שעות העבודה שלך
+        <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">ברוכים הבאים!</h2>
+        <p className="text-gray-500 max-w-md mx-auto text-sm md:text-base">
+          {onOpenSidebar ? (
+            <>
+              לחץ על <button onClick={onOpenSidebar} className="text-blue-600 underline">התפריט</button> כדי ליצור גיליון חדש
+            </>
+          ) : (
+            'צור גיליון חדש מהתפריט כדי להתחיל לנהל את שעות העבודה שלך'
+          )}
         </p>
       </CardContent>
     </Card>

@@ -64,69 +64,77 @@ export function ScheduleTable() {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse bg-white rounded-xl shadow-sm overflow-hidden">
-        <thead>
-          <tr className="bg-gray-50">
-            <th className="border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-600 w-28">
-              {/* Empty header for time column */}
-            </th>
-            {DAYS.map((day, index) => (
-              <th
-                key={index}
-                className="border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-900 min-w-[140px]"
-              >
-                {day}
+    <div className="relative">
+      {/* Mobile scroll hint */}
+      <div className="md:hidden text-xs text-gray-400 text-center mb-2">
+        ← גלול לצדדים לראות את כל הימים →
+      </div>
+      
+      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <table className="w-full border-collapse bg-white rounded-xl shadow-sm overflow-hidden min-w-[700px]">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="border border-gray-200 px-2 md:px-4 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-600 w-16 md:w-28 sticky right-0 bg-gray-50 z-10">
+                {/* Empty header for time column */}
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {TIME_SLOTS.map((timeSlot, timeIndex) => (
-            <tr key={timeIndex} className="hover:bg-gray-50/50 transition-colors">
-              <td className="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-600 bg-gray-50 text-center">
-                {timeSlot}
-              </td>
-              {DAYS.map((_, dayIndex) => {
-                const isEditing =
-                  editingCell?.dayIndex === dayIndex &&
-                  editingCell?.timeSlot === timeIndex
-                const cellValue = getEntry(dayIndex, timeIndex)
-
-                return (
-                  <td
-                    key={dayIndex}
-                    className={`border border-gray-200 px-2 py-1 text-sm transition-colors cursor-pointer ${
-                      isEditing ? 'bg-blue-50' : cellValue ? 'bg-white' : 'hover:bg-gray-50'
-                    }`}
-                    onClick={() => !isEditing && handleCellClick(dayIndex, timeIndex)}
-                  >
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        onBlur={handleSave}
-                        onKeyDown={handleKeyDown}
-                        autoFocus
-                        disabled={saving}
-                        className="w-full px-2 py-1.5 text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                        placeholder="הזן תוכן..."
-                      />
-                    ) : (
-                      <div className="min-h-[36px] px-2 py-1.5 flex items-center">
-                        {cellValue || (
-                          <span className="text-gray-300 text-xs">לחץ לעריכה</span>
-                        )}
-                      </div>
-                    )}
-                  </td>
-                )
-              })}
+              {DAYS.map((day, index) => (
+                <th
+                  key={index}
+                  className="border border-gray-200 px-2 md:px-4 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-900 min-w-[100px] md:min-w-[140px]"
+                >
+                  {day}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {TIME_SLOTS.map((timeSlot, timeIndex) => (
+              <tr key={timeIndex} className="hover:bg-gray-50/50 transition-colors">
+                <td className="border border-gray-200 px-2 md:px-4 py-2 md:py-3 text-xs md:text-sm font-medium text-gray-600 bg-gray-50 text-center sticky right-0 z-10">
+                  {timeSlot}
+                </td>
+                {DAYS.map((_, dayIndex) => {
+                  const isEditing =
+                    editingCell?.dayIndex === dayIndex &&
+                    editingCell?.timeSlot === timeIndex
+                  const cellValue = getEntry(dayIndex, timeIndex)
+
+                  return (
+                    <td
+                      key={dayIndex}
+                      className={`border border-gray-200 px-1 md:px-2 py-1 text-xs md:text-sm transition-colors cursor-pointer ${
+                        isEditing ? 'bg-blue-50' : cellValue ? 'bg-white' : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => !isEditing && handleCellClick(dayIndex, timeIndex)}
+                    >
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onBlur={handleSave}
+                          onKeyDown={handleKeyDown}
+                          autoFocus
+                          disabled={saving}
+                          className="w-full px-1 md:px-2 py-1 md:py-1.5 text-xs md:text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                          placeholder="הזן תוכן..."
+                        />
+                      ) : (
+                        <div className="min-h-[32px] md:min-h-[36px] px-1 md:px-2 py-1 md:py-1.5 flex items-center">
+                          {cellValue || (
+                            <span className="text-gray-300 text-xs">לחץ לעריכה</span>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
+
