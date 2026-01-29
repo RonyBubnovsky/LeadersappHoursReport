@@ -68,7 +68,15 @@ export async function exportAllToExcel(sheets: Sheet[], filename?: string): Prom
   workbook.created = new Date()
 
   let grandTotal = 0
-  const allEntriesForSummary: { sheetName: string; className: string; date: string; hours: number }[] = []
+  const allEntriesForSummary: { 
+    sheetName: string; 
+    className: string; 
+    date: string; 
+    startTime: string;
+    endTime: string;
+    totalHours: string;
+    hours: number 
+  }[] = []
 
   for (const sheet of sheets) {
     const { data: entries } = await supabase
@@ -102,10 +110,15 @@ export async function exportAllToExcel(sheets: Sheet[], filename?: string): Prom
 
     entries.forEach(entry => {
       worksheet.addRow(entry)
+      // Format total_hours to HH:MM:SS for summary
+      const totalHoursFormatted = formatTotalHours(entry.total_hours)
       allEntriesForSummary.push({
         sheetName: sheet.name,
         className: entry.class_name,
         date: entry.date_str,
+        startTime: entry.start_time,
+        endTime: entry.end_time,
+        totalHours: totalHoursFormatted,
         hours: entry.pay_hours,
       })
     })
@@ -129,6 +142,9 @@ export async function exportAllToExcel(sheets: Sheet[], filename?: string): Prom
     { header: 'שם הגיליון', key: 'sheetName', width: 20 },
     { header: 'שם הכיתה/פעילות', key: 'className', width: 25 },
     { header: 'תאריך', key: 'date', width: 15 },
+    { header: 'שעת התחלה', key: 'startTime', width: 12 },
+    { header: 'שעת סיום', key: 'endTime', width: 12 },
+    { header: 'סה"כ שעות', key: 'totalHours', width: 12 },
     { header: 'שעות לתשלום', key: 'hours', width: 15 },
   ]
 
@@ -171,4 +187,33 @@ function downloadBlob(buffer: ArrayBuffer | ExcelJS.Buffer, filename: string): v
 
 function formatDate(): string {
   return new Date().toISOString().slice(0, 10).replace(/-/g, '')
+}
+
+/**
+ * Format total hours to HH:MM:SS format.
+ * Handles formats like "2 שעות ו-30 דקות" or "2:30" etc.
+ */
+function formatTotalHours(totalHours: string): string {
+  if (!totalHours) return '00:00:00'
+  
+  // If already in HH:MM format, add seconds
+  if (/^\d{1,2}:\d{2}$/.test(totalHours)) {
+    return `${totalHours}:00`
+  }
+  
+  // If already in HH:MM:SS format, return as is
+  if (/^\d{1,2}:\d{2}:\d{2}$/.test(totalHours)) {
+    return totalHours
+  }
+  
+  // Try to parse Hebrew format "X שעות ו-Y דקות"
+  const hebrewMatch = totalHours.match(/(\d+)\s*שעות?(?:\s*ו[־-]?(\d+)\s*דקות?)?/)
+  if (hebrewMatch) {
+    const hours = parseInt(hebrewMatch[1]) || 0
+    const minutes = parseInt(hebrewMatch[2]) || 0
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`
+  }
+  
+  // Return original with :00 if nothing matches
+  return totalHours.includes(':') ? `${totalHours}:00` : `${totalHours}:00:00`
 }
