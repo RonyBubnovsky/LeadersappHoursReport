@@ -18,6 +18,7 @@ interface EntriesContextType {
   createEntry: (input: CreateEntryInput) => Promise<Entry>
   deleteEntry: (sheetId: string, entryId: string) => Promise<void>
   deleteAllEntries: (sheetId: string) => Promise<void>
+  updateEntry: (sheetId: string, entryId: string, updates: Partial<CreateEntryInput>) => Promise<Entry>
 }
 
 const EntriesContext = createContext<EntriesContextType | null>(null)
@@ -106,6 +107,42 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
     }))
   }
 
+  const updateEntry = async (sheetId: string, entryId: string, updates: Partial<CreateEntryInput>) => {
+    let calculatedUpdates: Partial<Entry> = { ...updates }
+    
+    // Recalculate duration if times are updated
+    if (updates.start_time || updates.end_time) {
+      // We need the original entry to get the missing time if only one is updated
+      const currentEntry = entriesBySheet[sheetId]?.find(e => e.id === entryId)
+      if (currentEntry) {
+        const startTime = updates.start_time || currentEntry.start_time
+        const endTime = updates.end_time || currentEntry.end_time
+        const { total_hours, pay_hours } = calculateDuration(startTime, endTime)
+        calculatedUpdates = {
+          ...calculatedUpdates,
+          total_hours,
+          pay_hours
+        }
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('entries')
+      .update(calculatedUpdates)
+      .eq('id', entryId)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    setEntriesBySheet(prev => ({
+      ...prev,
+      [sheetId]: (prev[sheetId] || []).map(e => e.id === entryId ? data : e)
+    }))
+
+    return data
+  }
+
   const deleteAllEntries = async (sheetId: string) => {
     const { error } = await supabase
       .from('entries')
@@ -126,6 +163,7 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
     createEntry,
     deleteEntry,
     deleteAllEntries,
+    updateEntry,
   }), [getEntriesForSheet, fetchEntriesForSheet])
 
   return (
@@ -160,5 +198,6 @@ export function useEntries(sheetId: string | null) {
     createEntry: context.createEntry,
     deleteEntry: (entryId: string) => sheetId ? context.deleteEntry(sheetId, entryId) : Promise.resolve(),
     deleteAllEntries: () => sheetId ? context.deleteAllEntries(sheetId) : Promise.resolve(),
+    updateEntry: (entryId: string, updates: Partial<CreateEntryInput>) => sheetId ? context.updateEntry(sheetId, entryId, updates) : Promise.resolve({} as Entry),
   }
 }

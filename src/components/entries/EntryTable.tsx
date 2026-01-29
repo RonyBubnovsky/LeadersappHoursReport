@@ -1,16 +1,20 @@
 'use client'
 
-import { Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Trash2, Edit2 } from 'lucide-react'
 import { useEntries } from '@/hooks'
 import { Button, Card, CardHeader, CardTitle, CardContent, useConfirm } from '@/components/ui'
+import { EditEntryDialog } from './EditEntryDialog'
+import { Entry } from '@/types'
 
 interface EntryTableProps {
   sheetId: string
 }
 
 export function EntryTable({ sheetId }: EntryTableProps) {
-  const { entries, loading, deleteEntry, deleteAllEntries, totalPayHours } = useEntries(sheetId)
+  const { entries, loading, deleteEntry, deleteAllEntries, updateEntry, totalPayHours } = useEntries(sheetId)
   const confirm = useConfirm()
+  const [editingEntry, setEditingEntry] = useState<Entry | null>(null)
 
   const handleDeleteAll = async () => {
     const confirmed = await confirm({
@@ -99,14 +103,24 @@ export function EntryTable({ sheetId }: EntryTableProps) {
                   <td className="py-3 px-4 text-gray-600 text-right">{entry.total_hours}</td>
                   <td className="py-3 px-4 text-blue-600 font-medium text-right">{entry.pay_hours.toFixed(2)}</td>
                   <td className="py-3 px-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteEntry(entry.id)}
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingEntry(entry)}
+                        className="text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteEntry(entry.id)}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -114,6 +128,17 @@ export function EntryTable({ sheetId }: EntryTableProps) {
           </table>
         </div>
       </CardContent>
+
+      {editingEntry && (
+        <EditEntryDialog
+          entry={editingEntry}
+          isOpen={!!editingEntry}
+          onClose={() => setEditingEntry(null)}
+          onSave={async (entryId, updates) => {
+            await updateEntry(entryId, updates)
+          }}
+        />
+      )}
     </Card>
   )
 }
