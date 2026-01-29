@@ -16,6 +16,8 @@ interface SidebarProps {
   isMobile?: boolean
   isOpen?: boolean
   onClose?: () => void
+  // Prevents animation on initial page load
+  hasInteracted?: boolean
 }
 
 export function Sidebar({ 
@@ -25,7 +27,8 @@ export function Sidebar({
   showSummary,
   isMobile = false,
   isOpen = false,
-  onClose
+  onClose,
+  hasInteracted = false
 }: SidebarProps) {
   const { user, signOut } = useAuth()
   const { sheets, loading, createSheet } = useSheets()
@@ -78,9 +81,10 @@ export function Sidebar({
     onClose?.() // Close on mobile after action
   }
 
-  // Mobile classes
+  // Mobile classes - always show 'open' when isOpen is true
+  // Only skip animation on initial close (when hasInteracted is false and sidebar is closed)
   const mobileClasses = isMobile
-    ? `fixed top-0 right-0 h-full z-50 sidebar-mobile ${isOpen ? 'open' : ''}`
+    ? `fixed top-0 right-0 h-full z-50 sidebar-mobile ${isOpen ? 'open' : (hasInteracted ? '' : 'no-animation')}`
     : ''
 
   return (

@@ -91,22 +91,27 @@ export default function Dashboard() {
       <div className="flex flex-1 min-h-0">
         {/* Sidebar - hidden on mobile, shown as drawer when toggled */}
         {isMobile ? (
-          <Sidebar
-            selectedSheet={selectedSheet}
-            onSelectSheet={handleSelectSheet}
-            onShowSummary={handleShowSummary}
-            showSummary={showSummary}
-            isMobile={true}
-            isOpen={sidebarOpen}
-            onClose={closeSidebar}
-          />
+          // Only render mobile sidebar when it's open
+          sidebarOpen && (
+            <Sidebar
+              selectedSheet={selectedSheet}
+              onSelectSheet={handleSelectSheet}
+              onShowSummary={handleShowSummary}
+              showSummary={showSummary}
+              isMobile={true}
+              isOpen={sidebarOpen}
+              onClose={closeSidebar}
+            />
+          )
         ) : (
-          <Sidebar
-            selectedSheet={selectedSheet}
-            onSelectSheet={handleSelectSheet}
-            onShowSummary={handleShowSummary}
-            showSummary={showSummary}
-          />
+          <div className="hidden md:flex h-full">
+            <Sidebar
+              selectedSheet={selectedSheet}
+              onSelectSheet={handleSelectSheet}
+              onShowSummary={handleShowSummary}
+              showSummary={showSummary}
+            />
+          </div>
         )}
 
         {/* Main content */}
