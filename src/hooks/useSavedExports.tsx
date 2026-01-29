@@ -20,6 +20,7 @@ interface SavedExportsContextType {
   downloadExport: (exportItem: SavedExport) => Promise<void>
   deleteExport: (id: string, filePath: string) => Promise<boolean>
   refresh: () => Promise<void>
+  fetchExports: () => Promise<void>
 }
 
 const SavedExportsContext = createContext<SavedExportsContextType | null>(null)
@@ -121,8 +122,9 @@ export function SavedExportsProvider({ children }: { children: ReactNode }) {
     addExport,
     downloadExport,
     deleteExport,
-    refresh
-  }), [exports, loading, error, currentPage, totalPages, paginatedExports, addExport, downloadExport, deleteExport, refresh])
+    refresh,
+    fetchExports
+  }), [exports, loading, error, currentPage, totalPages, paginatedExports, addExport, downloadExport, deleteExport, refresh, fetchExports])
 
   return (
     <SavedExportsContext.Provider value={value}>
@@ -153,14 +155,10 @@ export function useFetchExportsOnMount() {
     throw new Error('useFetchExportsOnMount must be used within a SavedExportsProvider')
   }
   
-  const { refresh, loading, exports } = context
-  const hasFetched = useRef(false)
+  const { fetchExports } = context
   
   useEffect(() => {
-    // Only fetch if we haven't fetched yet and there are no exports
-    if (!hasFetched.current && exports.length === 0 && !loading) {
-      hasFetched.current = true
-      refresh()
-    }
-  }, [refresh, exports.length, loading])
+    // fetchExports checks hasFetched internally, so it only fetches once
+    fetchExports()
+  }, [fetchExports])
 }
