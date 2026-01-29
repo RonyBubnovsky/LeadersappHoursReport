@@ -1,6 +1,12 @@
 import ExcelJS from 'exceljs'
 import { createClient } from '@/lib/supabase/client'
+import { uploadExport } from '@/lib/supabase/storage'
 import type { Entry, Sheet } from '@/types'
+
+interface ExportOptions {
+  saveToCloud?: boolean
+  userId?: string
+}
 
 /**
  * Export entries to Excel file with RTL support.
@@ -61,7 +67,7 @@ export async function exportToExcel(entries: Entry[], sheetName: string): Promis
 /**
  * Export all sheets to a single Excel file with multiple worksheets.
  */
-export async function exportAllToExcel(sheets: Sheet[], filename?: string): Promise<void> {
+export async function exportAllToExcel(sheets: Sheet[], filename?: string, options?: ExportOptions): Promise<void> {
   const supabase = createClient()
   const workbook = new ExcelJS.Workbook()
   workbook.creator = 'Hours Tracker'
@@ -171,6 +177,19 @@ export async function exportAllToExcel(sheets: Sheet[], filename?: string): Prom
   const finalFilename = filename || `דוח_מלא_${formatDate()}`
   const buffer = await workbook.xlsx.writeBuffer()
   downloadBlob(buffer, `${finalFilename}.xlsx`)
+
+  // Save to Supabase Storage if requested
+  if (options?.saveToCloud && options?.userId) {
+    try {
+      await uploadExport(buffer, finalFilename, options.userId, {
+        sheetsCount: sheets.length,
+        totalHours: grandTotal
+      })
+    } catch (error) {
+      console.error('Error saving export to cloud:', error)
+      // Don't throw - the local download already succeeded
+    }
+  }
 }
 
 function downloadBlob(buffer: ArrayBuffer | ExcelJS.Buffer, filename: string): void {

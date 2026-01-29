@@ -61,7 +61,10 @@ export default function Dashboard() {
       cancelText: 'ביטול',
     })
     if (filename) {
-      await exportAllToExcel(sheets, filename)
+      await exportAllToExcel(sheets, filename, {
+        saveToCloud: true,
+        userId: user?.id
+      })
     }
   }
 
