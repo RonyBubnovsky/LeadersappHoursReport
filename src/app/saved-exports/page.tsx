@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Archive, Download, Trash2, FileSpreadsheet, RefreshCw } from 'lucide-react'
-import { useAuth, useSavedExports } from '@/hooks'
+import { Archive, Download, Trash2, FileSpreadsheet, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useAuth, useSavedExports, useFetchExportsOnMount } from '@/hooks'
 import { NavBar } from '@/components/layout'
 import { Button, Card, CardContent, useConfirm, LoadingScreen } from '@/components/ui'
 import type { SavedExport } from '@/types'
@@ -11,8 +11,22 @@ import type { SavedExport } from '@/types'
 export default function SavedExportsPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const { exports, loading, error, downloadExport, deleteExport, refresh } = useSavedExports()
+  const { 
+    paginatedExports, 
+    loading, 
+    error, 
+    downloadExport, 
+    deleteExport, 
+    refresh,
+    currentPage,
+    totalPages,
+    setCurrentPage,
+    exports
+  } = useSavedExports()
   const confirm = useConfirm()
+  
+  // Fetch exports on mount (only once)
+  useFetchExportsOnMount()
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -63,6 +77,18 @@ export default function SavedExportsPage() {
     if (bytes < 1024) return `${bytes} B`
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
   }
 
   return (
@@ -125,106 +151,145 @@ export default function SavedExportsPage() {
               </CardContent>
             </Card>
           ) : (
-            <Card variant="bordered">
-              <CardContent className="p-0">
-                {/* Desktop table */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-100">
-                      <tr>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">שם הקובץ</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">תאריך</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">גיליונות</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">שעות</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">גודל</th>
-                        <th className="text-center py-3 px-4 text-sm font-medium text-gray-700">פעולות</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {exports.map((exportItem) => (
-                        <tr key={exportItem.id} className="hover:bg-gray-50">
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-2">
-                              <FileSpreadsheet className="w-4 h-4 text-green-600" />
-                              <span className="text-gray-900 font-medium">{exportItem.file_name}</span>
-                            </div>
-                          </td>
-                          <td className="py-3 px-4 text-gray-600 text-sm">
-                            {formatDate(exportItem.created_at)}
-                          </td>
-                          <td className="py-3 px-4 text-gray-600 text-sm">
-                            {exportItem.sheets_count}
-                          </td>
-                          <td className="py-3 px-4 text-blue-600 font-medium text-sm">
-                            {exportItem.total_hours.toFixed(2)}
-                          </td>
-                          <td className="py-3 px-4 text-gray-500 text-sm">
-                            {formatFileSize(exportItem.file_size)}
-                          </td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-center justify-center gap-2">
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => handleDownload(exportItem)}
-                              >
-                                <Download className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => handleDelete(exportItem)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </td>
+            <div className="space-y-4">
+              <Card variant="bordered">
+                <CardContent className="p-0">
+                  {/* Desktop table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">שם הקובץ</th>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">תאריך</th>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">גיליונות</th>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">שעות</th>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-gray-700">גודל</th>
+                          <th className="text-center py-3 px-4 text-sm font-medium text-gray-700">פעולות</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {paginatedExports.map((exportItem) => (
+                          <tr key={exportItem.id} className="hover:bg-gray-50">
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-2">
+                                <FileSpreadsheet className="w-4 h-4 text-green-600" />
+                                <span className="text-gray-900 font-medium">{exportItem.file_name}</span>
+                              </div>
+                            </td>
+                            <td className="py-3 px-4 text-gray-600 text-sm">
+                              {formatDate(exportItem.created_at)}
+                            </td>
+                            <td className="py-3 px-4 text-gray-600 text-sm">
+                              {exportItem.sheets_count}
+                            </td>
+                            <td className="py-3 px-4 text-blue-600 font-medium text-sm">
+                              {exportItem.total_hours.toFixed(2)}
+                            </td>
+                            <td className="py-3 px-4 text-gray-500 text-sm">
+                              {formatFileSize(exportItem.file_size)}
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="flex items-center justify-center gap-2">
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => handleDownload(exportItem)}
+                                >
+                                  <Download className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="danger"
+                                  size="sm"
+                                  onClick={() => handleDelete(exportItem)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
 
-                {/* Mobile cards */}
-                <div className="md:hidden divide-y divide-gray-100">
-                  {exports.map((exportItem) => (
-                    <div key={exportItem.id} className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <FileSpreadsheet className="w-5 h-5 text-green-600 flex-shrink-0" />
-                          <span className="text-gray-900 font-medium truncate">
-                            {exportItem.file_name}
+                  {/* Mobile cards */}
+                  <div className="md:hidden divide-y divide-gray-100">
+                    {paginatedExports.map((exportItem) => (
+                      <div key={exportItem.id} className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <FileSpreadsheet className="w-5 h-5 text-green-600 flex-shrink-0" />
+                            <span className="text-gray-900 font-medium truncate">
+                              {exportItem.file_name}
+                            </span>
+                          </div>
+                          <div className="flex gap-2 flex-shrink-0">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => handleDownload(exportItem)}
+                            >
+                              <Download className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => handleDelete(exportItem)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+                          <span>{formatDate(exportItem.created_at)}</span>
+                          <span>{exportItem.sheets_count} גיליונות</span>
+                          <span className="text-blue-600 font-medium">
+                            {exportItem.total_hours.toFixed(2)} שעות
                           </span>
                         </div>
-                        <div className="flex gap-2 flex-shrink-0">
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => handleDownload(exportItem)}
-                          >
-                            <Download className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleDelete(exportItem)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
-                        <span>{formatDate(exportItem.created_at)}</span>
-                        <span>{exportItem.sheets_count} גיליונות</span>
-                        <span className="text-blue-600 font-medium">
-                          {exportItem.total_hours.toFixed(2)} שעות
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                    <span className="hidden sm:inline">הקודם</span>
+                  </Button>
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span>עמוד</span>
+                    <span className="font-medium text-gray-900">{currentPage}</span>
+                    <span>מתוך</span>
+                    <span className="font-medium text-gray-900">{totalPages}</span>
+                  </div>
+                  
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    <span className="hidden sm:inline">הבא</span>
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              )}
+              
+              {/* Total count */}
+              <p className="text-center text-sm text-gray-500">
+                סה״כ {exports.length} קבצים שמורים
+              </p>
+            </div>
           )}
         </div>
       </main>

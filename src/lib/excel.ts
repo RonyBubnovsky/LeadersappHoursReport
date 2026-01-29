@@ -1,11 +1,12 @@
 import ExcelJS from 'exceljs'
 import { createClient } from '@/lib/supabase/client'
 import { uploadExport } from '@/lib/supabase/storage'
-import type { Entry, Sheet } from '@/types'
+import type { Entry, Sheet, SavedExport } from '@/types'
 
 interface ExportOptions {
   saveToCloud?: boolean
   userId?: string
+  onSuccess?: (savedExport: SavedExport) => void
 }
 
 /**
@@ -181,10 +182,14 @@ export async function exportAllToExcel(sheets: Sheet[], filename?: string, optio
   // Save to Supabase Storage if requested
   if (options?.saveToCloud && options?.userId) {
     try {
-      await uploadExport(buffer, finalFilename, options.userId, {
+      const savedExport = await uploadExport(buffer, finalFilename, options.userId, {
         sheetsCount: sheets.length,
         totalHours: grandTotal
       })
+      // Call onSuccess callback with the saved export for immediate UI update
+      if (savedExport && options.onSuccess) {
+        options.onSuccess(savedExport)
+      }
     } catch (error) {
       console.error('Error saving export to cloud:', error)
       // Don't throw - the local download already succeeded

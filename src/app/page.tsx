@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Clock, Download, Trash2, Menu } from 'lucide-react'
-import { useAuth, useSheets, useEntries, useSidebarState } from '@/hooks'
+import { useAuth, useSheets, useEntries, useSidebarState, useSavedExports } from '@/hooks'
 import { Sidebar, NavBar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
 import { Button, Card, CardContent, useConfirm, useInputDialog, LoadingScreen } from '@/components/ui'
@@ -14,6 +14,7 @@ export default function Dashboard() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
   const { sheets, deleteSheet } = useSheets()
+  const { addExport } = useSavedExports()
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null)
   const [showSummary, setShowSummary] = useState(false)
   const { entries } = useEntries(selectedSheet?.id ?? null)
@@ -63,7 +64,8 @@ export default function Dashboard() {
     if (filename) {
       await exportAllToExcel(sheets, filename, {
         saveToCloud: true,
-        userId: user?.id
+        userId: user?.id,
+        onSuccess: addExport
       })
     }
   }
