@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Archive, Download, Trash2, FileSpreadsheet, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Archive, Download, Trash2, FileSpreadsheet, RefreshCw, ChevronLeft, ChevronRight, Trash } from 'lucide-react'
 import { useAuth, useSavedExports, useFetchExportsOnMount } from '@/hooks'
 import { NavBar } from '@/components/layout'
 import { Button, Card, CardContent, useConfirm, LoadingScreen } from '@/components/ui'
@@ -16,7 +16,8 @@ export default function SavedExportsPage() {
     loading, 
     error, 
     downloadExport, 
-    deleteExport, 
+    deleteExport,
+    deleteAllExports,
     refresh,
     currentPage,
     totalPages,
@@ -59,6 +60,19 @@ export default function SavedExportsPage() {
     })
     if (confirmed) {
       await deleteExport(exportItem.id, exportItem.file_path)
+    }
+  }
+
+  const handleDeleteAll = async () => {
+    const confirmed = await confirm({
+      title: 'מחיקת כל הקבצים',
+      message: `האם אתה בטוח שברצונך למחוק את כל ${exports.length} הקבצים? פעולה זו לא ניתנת לביטול.`,
+      confirmText: 'מחק הכל',
+      cancelText: 'ביטול',
+      variant: 'danger',
+    })
+    if (confirmed) {
+      await deleteAllExports()
     }
   }
 
@@ -112,10 +126,18 @@ export default function SavedExportsPage() {
                   </p>
                 </div>
               </div>
-              <Button onClick={refresh} variant="secondary" size="sm" disabled={loading}>
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">רענן</span>
-              </Button>
+              <div className="flex gap-2">
+                {exports.length > 0 && (
+                  <Button onClick={handleDeleteAll} variant="danger" size="sm" disabled={loading}>
+                    <Trash className="w-4 h-4" />
+                    <span className="hidden sm:inline">מחק הכל</span>
+                  </Button>
+                )}
+                <Button onClick={refresh} variant="secondary" size="sm" disabled={loading}>
+                  <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">רענן</span>
+                </Button>
+              </div>
             </div>
           </header>
 

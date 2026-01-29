@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo, useRef } from 'react'
-import { listExports, downloadExport as downloadExportFile, deleteExport as deleteExportFile } from '@/lib/supabase/storage'
+import { listExports, downloadExport as downloadExportFile, deleteExport as deleteExportFile, deleteAllExports as deleteAllExportsFile } from '@/lib/supabase/storage'
 import type { SavedExport } from '@/types'
 
 const ITEMS_PER_PAGE = 5
@@ -19,6 +19,7 @@ interface SavedExportsContextType {
   addExport: (newExport: SavedExport) => void
   downloadExport: (exportItem: SavedExport) => Promise<void>
   deleteExport: (id: string, filePath: string) => Promise<boolean>
+  deleteAllExports: () => Promise<boolean>
   refresh: () => Promise<void>
   fetchExports: () => Promise<void>
 }
@@ -103,6 +104,20 @@ export function SavedExportsProvider({ children }: { children: ReactNode }) {
     }
   }, [currentPage])
 
+  const deleteAllExports = useCallback(async () => {
+    try {
+      const success = await deleteAllExportsFile(exports)
+      if (success) {
+        setExports([])
+        setCurrentPage(1)
+      }
+      return success
+    } catch (err) {
+      console.error('Error deleting all exports:', err)
+      return false
+    }
+  }, [exports])
+
   // Pagination calculations
   const totalPages = Math.max(1, Math.ceil(exports.length / ITEMS_PER_PAGE))
   
@@ -122,9 +137,10 @@ export function SavedExportsProvider({ children }: { children: ReactNode }) {
     addExport,
     downloadExport,
     deleteExport,
+    deleteAllExports,
     refresh,
     fetchExports
-  }), [exports, loading, error, currentPage, totalPages, paginatedExports, addExport, downloadExport, deleteExport, refresh, fetchExports])
+  }), [exports, loading, error, currentPage, totalPages, paginatedExports, addExport, downloadExport, deleteExport, deleteAllExports, refresh, fetchExports])
 
   return (
     <SavedExportsContext.Provider value={value}>

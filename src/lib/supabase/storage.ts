@@ -154,3 +154,37 @@ export async function listExports(): Promise<SavedExport[]> {
   
   return data as SavedExport[]
 }
+
+/**
+ * Delete all exports for the current user.
+ */
+export async function deleteAllExports(exports: SavedExport[]): Promise<boolean> {
+  if (exports.length === 0) return true
+  
+  const supabase = createClient()
+  
+  // Delete all files from Storage
+  const filePaths = exports.map(e => e.file_path)
+  const { error: storageError } = await supabase.storage
+    .from(BUCKET_NAME)
+    .remove(filePaths)
+  
+  if (storageError) {
+    console.error('Error deleting files from storage:', storageError)
+    // Continue to try deleting metadata anyway
+  }
+  
+  // Delete all metadata from database
+  const ids = exports.map(e => e.id)
+  const { error: dbError } = await supabase
+    .from('saved_exports')
+    .delete()
+    .in('id', ids)
+  
+  if (dbError) {
+    console.error('Error deleting export metadata:', dbError)
+    return false
+  }
+  
+  return true
+}
