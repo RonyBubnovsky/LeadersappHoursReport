@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, useMemo, useRef, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useMemo, useRef, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from './useAuth'
 
