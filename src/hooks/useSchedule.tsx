@@ -18,6 +18,7 @@ interface ScheduleContextType {
   updateEntry: (dayIndex: number, timeSlot: number, content: string) => Promise<void>
   getEntry: (dayIndex: number, timeSlot: number) => string
   refetch: () => Promise<void>
+  clearAll: () => Promise<void>
 }
 
 const ScheduleContext = createContext<ScheduleContextType | null>(null)
@@ -126,6 +127,19 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const clearAll = async () => {
+    if (!user) throw new Error('Not authenticated')
+    if (entries.length === 0) return
+
+    const { error } = await supabase
+      .from('schedule_entries')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (error) throw error
+    setEntries([])
+  }
+
   const getEntry = (dayIndex: number, timeSlot: number): string => {
     const entry = entries.find(
       e => e.day_index === dayIndex && e.time_slot === timeSlot
@@ -134,7 +148,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ScheduleContext.Provider value={{ entries, loading, error, updateEntry, getEntry, refetch: fetchEntries }}>
+    <ScheduleContext.Provider value={{ entries, loading, error, updateEntry, getEntry, refetch: fetchEntries, clearAll }}>
       {children}
     </ScheduleContext.Provider>
   )

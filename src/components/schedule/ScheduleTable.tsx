@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { useSchedule, TIME_SLOTS, DAYS } from '@/hooks'
+import { ScheduleActions } from './ScheduleActions'
 
 interface EditableCell {
   dayIndex: number
@@ -65,6 +66,9 @@ export function ScheduleTable() {
 
   return (
     <div className="relative">
+      {/* Action buttons */}
+      <ScheduleActions />
+
       {/* Mobile scroll hint */}
       <div className="md:hidden text-xs text-gray-400 text-center mb-2">
         ← גלול לצדדים לראות את כל הימים →
