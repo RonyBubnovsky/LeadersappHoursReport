@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { useSchedule, TIME_SLOTS, DAYS } from '@/hooks'
 import { ScheduleActions } from './ScheduleActions'
 
@@ -10,16 +10,10 @@ interface EditableCell {
 }
 
 export function ScheduleTable() {
-  const { loading, error, updateEntry, getEntry, refetch } = useSchedule()
+  const { loading, error, updateEntry, getEntry } = useSchedule()
   const [editingCell, setEditingCell] = useState<EditableCell | null>(null)
   const [editValue, setEditValue] = useState('')
   const [saving, setSaving] = useState(false)
-
-  // Trigger fetch when component mounts (lazy loading)
-  // The refetch function respects hasFetched, so it won't re-fetch if already loaded
-  useEffect(() => {
-    refetch()
-  }, [refetch])
 
   const handleCellClick = (dayIndex: number, timeSlot: number) => {
     const currentValue = getEntry(dayIndex, timeSlot)
