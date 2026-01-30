@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useRef, ReactNode } from 'react'
 
 interface AdminUser {
   id: string
@@ -27,31 +27,52 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [isChecking, setIsChecking] = useState(true)
   const [users, setUsers] = useState<AdminUser[]>([])
   const [isLoadingUsers, setIsLoadingUsers] = useState(false)
+  
+  const hasCheckedRef = useRef(false)
+  const isCheckingRef = useRef(false)
+  const hasFetchedUsersRef = useRef(false)
+  const isFetchingUsersRef = useRef(false)
 
   const checkAdminStatus = useCallback(async () => {
+    // Skip if already checked or currently checking
+    if (hasCheckedRef.current || isCheckingRef.current) {
+      return
+    }
+    
+    isCheckingRef.current = true
     setIsChecking(true)
     try {
       const response = await fetch('/api/admin/check')
       const data = await response.json()
       setIsAdmin(data.isAdmin === true)
+      hasCheckedRef.current = true
     } catch {
       setIsAdmin(false)
     }
     setIsChecking(false)
+    isCheckingRef.current = false
   }, [])
 
   const fetchUsers = useCallback(async () => {
+    // Skip if already fetched or currently fetching
+    if (hasFetchedUsersRef.current || isFetchingUsersRef.current) {
+      return
+    }
+    
+    isFetchingUsersRef.current = true
     setIsLoadingUsers(true)
     try {
       const response = await fetch('/api/admin/users')
       if (response.ok) {
         const data = await response.json()
         setUsers(data.users || [])
+        hasFetchedUsersRef.current = true
       }
     } catch (error) {
       console.error('Failed to fetch users:', error)
     }
     setIsLoadingUsers(false)
+    isFetchingUsersRef.current = false
   }, [])
 
   const deleteUser = useCallback(async (userId: string): Promise<boolean> => {
