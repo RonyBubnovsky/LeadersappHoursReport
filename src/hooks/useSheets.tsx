@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useMemo, useRef, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Sheet } from '@/types'
 
@@ -17,11 +17,19 @@ const SheetsContext = createContext<SheetsContextType | null>(null)
 
 export function SheetsProvider({ children }: { children: ReactNode }) {
   const [sheets, setSheets] = useState<Sheet[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
+  const hasFetchedRef = useRef(false)
+  const isFetchingRef = useRef(false)
+  const supabase = useMemo(() => createClient(), [])
 
-  const fetchSheets = useCallback(async () => {
+  const fetchSheets = useCallback(async (force = false) => {
+    // Skip if already fetched (unless forced) or currently fetching
+    if ((hasFetchedRef.current && !force) || isFetchingRef.current) {
+      return
+    }
+    
+    isFetchingRef.current = true
     setLoading(true)
     setError(null)
     
@@ -34,13 +42,13 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
       setError(error.message)
     } else {
       setSheets(data || [])
+      hasFetchedRef.current = true
     }
     setLoading(false)
+    isFetchingRef.current = false
   }, [supabase])
 
-  useEffect(() => {
-    fetchSheets()
-  }, [fetchSheets])
+  // No auto-fetch - let the home page trigger the fetch
 
   const createSheet = async (name: string) => {
     const { data: { user } } = await supabase.auth.getUser()
