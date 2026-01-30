@@ -79,15 +79,6 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     isFetchingRef.current = false
   }, [supabase, user])
 
-  // Auto-fetch when user becomes available
-  useEffect(() => {
-    if (user && !hasFetchedRef.current) {
-      fetchEntries()
-    }
-  }, [user, fetchEntries])
-
-  // Don't auto-fetch on mount - let the schedule page trigger the fetch
-
   const updateEntry = async (dayIndex: number, timeSlot: number, content: string) => {
     if (!user) throw new Error('Not authenticated')
 
