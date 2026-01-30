@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { AuthProvider, SheetsProvider, EntriesProvider, ScheduleProvider, SavedExportsProvider } from '@/hooks'
+import { AuthProvider, SheetsProvider, EntriesProvider, ScheduleProvider, SavedExportsProvider, AdminProvider } from '@/hooks'
 import { ConfirmProvider, InputDialogProvider } from '@/components/ui'
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -13,7 +13,9 @@ export function Providers({ children }: { children: ReactNode }) {
             <EntriesProvider>
               <ScheduleProvider>
                 <SavedExportsProvider>
-                  {children}
+                  <AdminProvider>
+                    {children}
+                  </AdminProvider>
                 </SavedExportsProvider>
               </ScheduleProvider>
             </EntriesProvider>
@@ -23,3 +25,4 @@ export function Providers({ children }: { children: ReactNode }) {
     </AuthProvider>
   )
 }
+
