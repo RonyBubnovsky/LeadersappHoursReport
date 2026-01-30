@@ -13,7 +13,7 @@ import type { Sheet } from '@/types'
 export default function Dashboard() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const { sheets, deleteSheet } = useSheets()
+  const { sheets, deleteSheet, refetch: refetchSheets } = useSheets()
   const { addExport } = useSavedExports()
   const [selectedSheet, setSelectedSheet] = useState<Sheet | null>(null)
   const [showSummary, setShowSummary] = useState(false)
@@ -30,6 +30,12 @@ export default function Dashboard() {
       router.push('/login')
     }
   }, [user, authLoading, router])
+
+  // Lazy load sheets when visiting home page
+  useEffect(() => {
+    refetchSheets()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (authLoading) {
     return <LoadingScreen />
