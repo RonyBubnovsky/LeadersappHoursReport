@@ -21,7 +21,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Get initial session only once
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error } = await supabase.auth.getUser()
+      
+      // Handle case where user was deleted but session still exists
+      if (error?.code === 'user_not_found') {
+        await supabase.auth.signOut()
+        setUser(null)
+        setLoading(false)
+        return
+      }
+      
       setUser(user)
       setLoading(false)
     }

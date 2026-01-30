@@ -58,6 +58,18 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_your_key_here
 ```
 
+### Admin Panel Setup (Optional)
+
+For admin functionality (user management), add these server-side variables:
+
+```env
+SUPABASE_SECRET_KEY=sb_secret_your_secret_key_here
+ADMIN_USER_ID=your_admin_user_id
+```
+
+- `SUPABASE_SECRET_KEY` - Get from Supabase Dashboard → Settings → API → Secret keys
+- `ADMIN_USER_ID` - The user ID from `auth.users` table who should have admin access
+
 4. Run the development server:
 
 ```bash
