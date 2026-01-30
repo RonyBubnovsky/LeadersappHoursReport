@@ -65,6 +65,81 @@ export async function exportToExcel(entries: Entry[], sheetName: string): Promis
   downloadBlob(buffer, `${sheetName}_${formatDate()}.xlsx`)
 }
 
+interface ScheduleEntryForExcel {
+  day_index: number
+  time_slot: number
+  content: string
+}
+
+const SCHEDULE_DAYS = ['יום א׳', 'יום ב׳', 'יום ג׳', 'יום ד׳', 'יום ה׳']
+const SCHEDULE_TIME_SLOTS = [
+  '8:00-9:00', '9:00-10:00', '10:00-11:00', '11:00-12:00',
+  '12:00-13:00', '13:00-14:00', '14:00-15:00', '15:00-16:00',
+  '16:00-17:00', '17:00-18:00', '18:00-19:00', '19:00-20:00',
+]
+
+/**
+ * Export schedule entries to Excel file with a weekly grid layout.
+ */
+export async function exportScheduleToExcel(entries: ScheduleEntryForExcel[], filename?: string): Promise<void> {
+  const workbook = new ExcelJS.Workbook()
+  workbook.creator = 'Hours Tracker'
+  workbook.created = new Date()
+
+  const worksheet = workbook.addWorksheet('מערכת שעות', {
+    views: [{ rightToLeft: true }]
+  })
+
+  // Define columns: time slot + 5 days
+  worksheet.columns = [
+    { header: 'שעה', key: 'time', width: 14 },
+    ...SCHEDULE_DAYS.map((day, index) => ({ header: day, key: `day_${index}`, width: 18 }))
+  ]
+
+  // Style header row
+  const headerRow = worksheet.getRow(1)
+  headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+  headerRow.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FF9333EA' } // Purple color matching the schedule page
+  }
+  headerRow.alignment = { horizontal: 'center', vertical: 'middle' }
+
+  // Build a lookup map for quick access
+  const entryMap = new Map<string, string>()
+  entries.forEach(entry => {
+    entryMap.set(`${entry.day_index}-${entry.time_slot}`, entry.content)
+  })
+
+  // Add data rows for each time slot
+  SCHEDULE_TIME_SLOTS.forEach((timeSlot, timeIndex) => {
+    const rowData: Record<string, string> = { time: timeSlot }
+    SCHEDULE_DAYS.forEach((_, dayIndex) => {
+      rowData[`day_${dayIndex}`] = entryMap.get(`${dayIndex}-${timeIndex}`) || ''
+    })
+    const row = worksheet.addRow(rowData)
+    row.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }
+  })
+
+  // Style all cells with borders
+  worksheet.eachRow((row) => {
+    row.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+        left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+        bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+        right: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+      }
+    })
+  })
+
+  // Generate and download
+  const finalFilename = filename || `מערכת_שעות_${formatDate()}`
+  const buffer = await workbook.xlsx.writeBuffer()
+  downloadBlob(buffer, `${finalFilename}.xlsx`)
+}
+
 /**
  * Export all sheets to a single Excel file with multiple worksheets.
  */

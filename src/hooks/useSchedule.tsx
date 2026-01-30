@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useMemo, useRef, useEffect, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from './useAuth'
 
@@ -18,6 +18,7 @@ interface ScheduleContextType {
   updateEntry: (dayIndex: number, timeSlot: number, content: string) => Promise<void>
   getEntry: (dayIndex: number, timeSlot: number) => string
   refetch: () => Promise<void>
+  clearAll: () => Promise<void>
 }
 
 const ScheduleContext = createContext<ScheduleContextType | null>(null)
@@ -43,9 +44,10 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   const [entries, setEntries] = useState<ScheduleEntry[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [hasFetched, setHasFetched] = useState(false)
+  const hasFetchedRef = useRef(false)
+  const isFetchingRef = useRef(false)
   const { user } = useAuth()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const fetchEntries = useCallback(async (force = false) => {
     if (!user) {
@@ -53,11 +55,12 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
       return
     }
     
-    // Skip if already fetched (unless forced)
-    if (hasFetched && !force) {
+    // Skip if already fetched (unless forced) or currently fetching
+    if ((hasFetchedRef.current && !force) || isFetchingRef.current) {
       return
     }
     
+    isFetchingRef.current = true
     setLoading(true)
     setError(null)
 
@@ -70,12 +73,11 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
       setError(error.message)
     } else {
       setEntries(data || [])
-      setHasFetched(true)
+      hasFetchedRef.current = true
     }
     setLoading(false)
-  }, [supabase, user, hasFetched])
-
-  // Don't auto-fetch on mount - let the schedule page trigger the fetch
+    isFetchingRef.current = false
+  }, [supabase, user])
 
   const updateEntry = async (dayIndex: number, timeSlot: number, content: string) => {
     if (!user) throw new Error('Not authenticated')
@@ -126,6 +128,19 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const clearAll = async () => {
+    if (!user) throw new Error('Not authenticated')
+    if (entries.length === 0) return
+
+    const { error } = await supabase
+      .from('schedule_entries')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (error) throw error
+    setEntries([])
+  }
+
   const getEntry = (dayIndex: number, timeSlot: number): string => {
     const entry = entries.find(
       e => e.day_index === dayIndex && e.time_slot === timeSlot
@@ -134,7 +149,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ScheduleContext.Provider value={{ entries, loading, error, updateEntry, getEntry, refetch: fetchEntries }}>
+    <ScheduleContext.Provider value={{ entries, loading, error, updateEntry, getEntry, refetch: fetchEntries, clearAll }}>
       {children}
     </ScheduleContext.Provider>
   )

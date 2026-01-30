@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { useSchedule, TIME_SLOTS, DAYS } from '@/hooks'
+import { ScheduleActions } from './ScheduleActions'
 
 interface EditableCell {
   dayIndex: number
@@ -14,11 +15,11 @@ export function ScheduleTable() {
   const [editValue, setEditValue] = useState('')
   const [saving, setSaving] = useState(false)
 
-  // Trigger fetch when component mounts (lazy loading)
-  // The refetch function respects hasFetched, so it won't re-fetch if already loaded
+  // Lazy loading - fetch only when visiting the schedule page
   useEffect(() => {
     refetch()
-  }, [refetch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleCellClick = (dayIndex: number, timeSlot: number) => {
     const currentValue = getEntry(dayIndex, timeSlot)
@@ -65,6 +66,9 @@ export function ScheduleTable() {
 
   return (
     <div className="relative">
+      {/* Action buttons */}
+      <ScheduleActions />
+
       {/* Mobile scroll hint */}
       <div className="md:hidden text-xs text-gray-400 text-center mb-2">
         ← גלול לצדדים לראות את כל הימים →
