@@ -71,6 +71,9 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
   }, [entriesBySheet, loadingSheets])
 
   const createEntry = async (input: CreateEntryInput) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
     const { total_hours, pay_hours } = calculateDuration(input.start_time, input.end_time)
     
     const { data, error } = await supabase
@@ -94,6 +97,9 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
   }
 
   const deleteEntry = async (sheetId: string, entryId: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
     const { error } = await supabase
       .from('entries')
       .delete()
@@ -108,6 +114,9 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
   }
 
   const updateEntry = async (sheetId: string, entryId: string, updates: Partial<CreateEntryInput>) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
     let calculatedUpdates: Partial<Entry> = { ...updates }
     
     // Recalculate duration if times are updated
@@ -144,6 +153,9 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
   }
 
   const deleteAllEntries = async (sheetId: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
     const { error } = await supabase
       .from('entries')
       .delete()
