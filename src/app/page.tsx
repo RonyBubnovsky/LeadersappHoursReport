@@ -37,6 +37,16 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Sync selectedSheet with sheets array (e.g., when sheet name is updated)
+  useEffect(() => {
+    if (selectedSheet) {
+      const updatedSheet = sheets.find(s => s.id === selectedSheet.id)
+      if (updatedSheet && updatedSheet.name !== selectedSheet.name) {
+        setSelectedSheet(updatedSheet)
+      }
+    }
+  }, [sheets, selectedSheet])
+
   if (authLoading) {
     return <LoadingScreen />
   }
