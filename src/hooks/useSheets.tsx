@@ -9,6 +9,7 @@ interface SheetsContextType {
   loading: boolean
   error: string | null
   createSheet: (name: string) => Promise<Sheet>
+  updateSheet: (id: string, name: string) => Promise<void>
   deleteSheet: (id: string) => Promise<void>
   refetch: () => Promise<void>
 }
@@ -65,7 +66,23 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
     return data
   }
 
+  const updateSheet = async (id: string, name: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { error } = await supabase
+      .from('sheets')
+      .update({ name })
+      .eq('id', id)
+
+    if (error) throw error
+    setSheets(prev => prev.map(s => s.id === id ? { ...s, name } : s))
+  }
+
   const deleteSheet = async (id: string) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
     const { error } = await supabase
       .from('sheets')
       .delete()
@@ -76,7 +93,7 @@ export function SheetsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <SheetsContext.Provider value={{ sheets, loading, error, createSheet, deleteSheet, refetch: fetchSheets }}>
+    <SheetsContext.Provider value={{ sheets, loading, error, createSheet, updateSheet, deleteSheet, refetch: fetchSheets }}>
       {children}
     </SheetsContext.Provider>
   )

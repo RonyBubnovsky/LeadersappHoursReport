@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, FileSpreadsheet, ChevronRight, BarChart3, X } from 'lucide-react'
+import { Plus, FileSpreadsheet, ChevronRight, BarChart3, X, Pencil } from 'lucide-react'
 import { useAuth, useSheets } from '@/hooks'
-import { Button, Input, useConfirm } from '@/components/ui'
+import { Button, Input, useConfirm, useInputDialog } from '@/components/ui'
 import { deleteUserAndData } from '@/services/userService'
 import type { Sheet } from '@/types'
 
@@ -31,7 +31,8 @@ export function Sidebar({
   hasInteracted = false
 }: SidebarProps) {
   const { user, signOut } = useAuth()
-  const { sheets, loading, createSheet } = useSheets()
+  const { sheets, loading, createSheet, updateSheet } = useSheets()
+  const promptInput = useInputDialog()
   const [newSheetName, setNewSheetName] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -74,6 +75,20 @@ export function Sidebar({
   const handleSelectSheet = (sheet: Sheet) => {
     onSelectSheet(sheet)
     onClose?.() // Close on mobile after selection
+  }
+
+  const handleEditSheet = async (e: React.MouseEvent, sheet: Sheet) => {
+    e.stopPropagation()
+    const newName = await promptInput({
+      title: 'עריכת שם גיליון',
+      message: 'הזן שם חדש לגיליון',
+      defaultValue: sheet.name,
+      confirmText: 'שמור',
+      cancelText: 'ביטול',
+    })
+    if (newName && newName.trim() && newName !== sheet.name) {
+      await updateSheet(sheet.id, newName.trim())
+    }
   }
 
   const handleShowSummary = () => {
@@ -152,14 +167,23 @@ export function Sidebar({
                 <button
                   key={sheet.id}
                   onClick={() => handleSelectSheet(sheet)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors group ${
                     selectedSheet?.id === sheet.id && !showSummary
                       ? 'bg-blue-50 text-blue-700 font-medium'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <ChevronRight className="w-4 h-4" />
-                  <span className="truncate">{sheet.name}</span>
+                  <ChevronRight className="w-4 h-4 flex-shrink-0 self-center" />
+                  <span className="truncate flex-1 text-right">{sheet.name}</span>
+                  <span
+                    role="button"
+                    onClick={(e) => handleEditSheet(e, sheet)}
+                    className={`p-1 rounded hover:bg-gray-200 transition-opacity inline-flex items-center justify-center ${
+                      isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                    }`}
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </span>
                 </button>
               ))}
             </nav>
