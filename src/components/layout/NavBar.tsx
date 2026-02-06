@@ -24,6 +24,7 @@ export function NavBar() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                   isActive
                     ? 'bg-blue-50 text-blue-700'
