@@ -2,6 +2,12 @@
 
 A web application for tracking work hours and generating Excel reports.
 
+## Live Deployment
+
+The project is live and deployed on Vercel:
+
+http://leadersapp-hours-report.vercel.app/
+
 ## Overview
 
 This project was developed to meet my personal need for tracking work hours and managing my weekly schedule as an instructor and teacher at LeadersApp, and is also designed to help other instructors manage their hours and schedules. The application allows users to track their work hours with detailed entries including date, duration, and descriptions. The system stores all data in Supabase and provides the ability to export comprehensive reports to Excel format.
