@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Clock, Download, Trash2, Menu } from 'lucide-react'
-import { useAuth, useSheets, useEntries, useSidebarState, useSavedExports } from '@/hooks'
+import { useAuth, useSheets, useEntries, useSidebarState, useSavedExports, useAllSheetsTotalHours } from '@/hooks'
 import { Sidebar, NavBar } from '@/components/layout'
 import { EntryForm, EntryTable } from '@/components/entries'
 import { Button, Card, CardContent, useConfirm, useInputDialog, LoadingScreen } from '@/components/ui'
@@ -210,10 +210,20 @@ function SheetView({ sheetId }: { sheetId: string }) {
 }
 
 function SummaryView({ sheets }: { sheets: Sheet[] }) {
+  const totalHours = useAllSheetsTotalHours(sheets.map(s => s.id))
+  
   return (
     <Card variant="bordered">
       <CardContent className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">סיכום כל הגיליונות</h2>
+        <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">סיכום כל הגיליונות</h2>
+          {sheets.length > 0 && (
+            <div className="flex items-center justify-between gap-2 px-4 py-2 rounded-lg bg-blue-50 border border-blue-200 sm:justify-start">
+              <span className="text-sm text-gray-600">סה״כ:</span>
+              <span className="text-base font-semibold text-blue-700 sm:text-lg">{totalHours.toFixed(2)} שעות</span>
+            </div>
+          )}
+        </div>
         {sheets.length === 0 ? (
           <p className="text-gray-500">אין גיליונות להצגה</p>
         ) : (
