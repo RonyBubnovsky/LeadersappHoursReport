@@ -14,6 +14,7 @@ interface EntriesState {
 
 interface EntriesContextType {
   getEntriesForSheet: (sheetId: string) => EntriesState
+  getTotalHoursForSheets: (sheetIds: string[]) => number
   fetchEntriesForSheet: (sheetId: string) => void
   createEntry: (input: CreateEntryInput) => Promise<Entry>
   deleteEntry: (sheetId: string, entryId: string) => Promise<void>
@@ -69,6 +70,13 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
       totalPayHours,
     }
   }, [entriesBySheet, loadingSheets])
+
+  const getTotalHoursForSheets = useCallback((sheetIds: string[]): number => {
+    return sheetIds.reduce((sum, id) => {
+      const entries = entriesBySheet[id] || []
+      return sum + entries.reduce((s, e) => s + e.pay_hours, 0)
+    }, 0)
+  }, [entriesBySheet])
 
   const createEntry = async (input: CreateEntryInput) => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -171,12 +179,13 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => ({
     getEntriesForSheet,
+    getTotalHoursForSheets,
     fetchEntriesForSheet,
     createEntry,
     deleteEntry,
     deleteAllEntries,
     updateEntry,
-  }), [getEntriesForSheet, fetchEntriesForSheet])
+  }), [getEntriesForSheet, getTotalHoursForSheets, fetchEntriesForSheet])
 
   return (
     <EntriesContext.Provider value={value}>
@@ -212,4 +221,10 @@ export function useEntries(sheetId: string | null) {
     deleteAllEntries: () => sheetId ? context.deleteAllEntries(sheetId) : Promise.resolve(),
     updateEntry: (entryId: string, updates: Partial<CreateEntryInput>) => sheetId ? context.updateEntry(sheetId, entryId, updates) : Promise.resolve({} as Entry),
   }
+}
+
+export function useAllSheetsTotalHours(sheetIds: string[]): number {
+  const context = useContext(EntriesContext)
+  if (!context) throw new Error('useAllSheetsTotalHours must be used within an EntriesProvider')
+  return context.getTotalHoursForSheets(sheetIds)
 }
