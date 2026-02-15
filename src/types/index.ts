@@ -62,3 +62,12 @@ export interface SavedExport {
   total_hours: number
   created_at: string
 }
+
+// Attendance link (external Drive/website links)
+export interface AttendanceLink {
+  id: string
+  user_id: string
+  name: string
+  url: string
+  created_at: string
+}

@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Calendar, Archive } from 'lucide-react'
+import { Home, Calendar, Archive, ClipboardList } from 'lucide-react'
 
 const navItems = [
   { href: '/', label: 'בית', fullLabel: 'דף הבית', icon: Home },
   { href: '/schedule', label: 'מערכת', fullLabel: 'מערכת שעות', icon: Calendar },
   { href: '/saved-exports', label: 'שמורים', fullLabel: 'גיליונות שמורים', icon: Archive },
+  { href: '/attendance', label: 'נוכחות', fullLabel: 'נוכחות', icon: ClipboardList },
 ]
 
 export function NavBar() {
