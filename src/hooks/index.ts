@@ -5,5 +5,6 @@ export { useSchedule, ScheduleProvider, TIME_SLOTS, DAYS } from './useSchedule'
 export { useMobile, useSidebarState } from './useMobile'
 export { useSavedExports, SavedExportsProvider, useFetchExportsOnMount } from './useSavedExports'
 export { useAdmin, AdminProvider } from './useAdmin'
+export { useAttendanceLinks, AttendanceLinksProvider } from './useAttendanceLinks'
 
 
