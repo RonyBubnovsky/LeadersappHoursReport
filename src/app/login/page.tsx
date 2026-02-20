@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks'
 import { Button, Card, CardContent, LoadingScreen } from '@/components/ui'
 import { EmailSignInForm, EmailSignUpForm, ForgotPasswordForm } from '@/components/auth'
@@ -9,12 +9,68 @@ import { Clock } from 'lucide-react'
 
 type AuthTab = 'signin' | 'signup' | 'forgot'
 
-export default function LoginPage() {
+/**
+ * Map URL error indicators to user-friendly Hebrew messages.
+ * Handles both the query-param errors set by our callback route
+ * (`?error=auth|confirmation`) and the hash-fragment errors that
+ * Supabase appends directly (`#error_code=otp_expired`).
+ */
+function getAuthErrorMessage(
+  errorParam: string | null,
+  hashErrorCode: string | null,
+): string | null {
+  // Hash fragment error codes from Supabase take priority because they are
+  // more specific (e.g. otp_expired, access_denied).
+  if (hashErrorCode) {
+    switch (hashErrorCode) {
+      case 'otp_expired':
+        return 'קישור האימות פג תוקף. נסה לשלוח קישור חדש.'
+      case 'access_denied':
+        return 'הגישה נדחתה. הקישור אינו תקף או שכבר נעשה בו שימוש.'
+      default:
+        return 'אירעה שגיאה באימות. נסה שוב.'
+    }
+  }
+
+  if (errorParam) {
+    switch (errorParam) {
+      case 'auth':
+        return 'אירעה שגיאה באימות. נסה שוב.'
+      case 'confirmation':
+        return 'אימות האימייל נכשל. נסה לשלוח קישור חדש.'
+      default:
+        return 'אירעה שגיאה. נסה שוב.'
+    }
+  }
+
+  return null
+}
+
+function LoginPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, loading: authLoading, signInWithGoogle } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<AuthTab>('signin')
+
+  // Pick up error indicators from the URL (query params + hash fragment)
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+
+    // Supabase appends error details in the hash fragment, e.g.
+    // #error=access_denied&error_code=otp_expired&error_description=...
+    const hash = window.location.hash.substring(1) // strip leading '#'
+    const hashParams = new URLSearchParams(hash)
+    const hashErrorCode = hashParams.get('error_code')
+
+    const message = getAuthErrorMessage(errorParam, hashErrorCode)
+    if (message) {
+      setError(message)
+      // Clean the URL so a refresh doesn't re-show the error
+      router.replace('/login', { scroll: false })
+    }
+  }, [searchParams, router])
 
   // Redirect to home if already authenticated
   useEffect(() => {
@@ -148,3 +204,10 @@ export default function LoginPage() {
   )
 }
 
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <LoginPageContent />
+    </Suspense>
+  )
+}
