@@ -29,3 +29,25 @@ export function getPasswordRules(password: string) {
 export function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
+
+const PASSWORD_UPDATE_ERRORS: Record<string, string> = {
+  same_password: 'הסיסמה החדשה חייבת להיות שונה מהסיסמה הנוכחית.',
+  weak_password: 'הסיסמה חלשה מדי. נסה סיסמה חזקה יותר.',
+  reauthentication: 'מסיבות אבטחה, נא להתנתק ולהתחבר מחדש כדי לשנות סיסמה.',
+  session_expired: 'פג תוקף הקישור. נא לבקש קישור איפוס חדש.',
+}
+
+export function mapPasswordUpdateError(errorCode: string | undefined, errorMessage: string): string {
+  if (errorCode && errorCode in PASSWORD_UPDATE_ERRORS) {
+    return PASSWORD_UPDATE_ERRORS[errorCode]
+  }
+  const msg = errorMessage.toLowerCase()
+  const matchedKey = Object.keys(PASSWORD_UPDATE_ERRORS).find(key =>
+    msg.includes(key.replace(/_/g, ' ')) || msg.includes(key)
+  )
+  if (matchedKey) return PASSWORD_UPDATE_ERRORS[matchedKey]
+  if (msg.includes('session') || msg.includes('recently')) {
+    return PASSWORD_UPDATE_ERRORS.reauthentication
+  }
+  return 'שגיאה בעדכון הסיסמה. נסה שוב.'
+}

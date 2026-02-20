@@ -4,7 +4,7 @@ import { useState, useEffect, FormEvent, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, Button, Input, LoadingScreen } from '@/components/ui'
 import { createClient } from '@/lib/supabase/client'
-import { validatePassword, getPasswordRules } from '@/lib/validation'
+import { validatePassword, getPasswordRules, mapPasswordUpdateError } from '@/lib/validation'
 import { Clock, CheckCircle, Circle } from 'lucide-react'
 
 function PasswordChecklist({ password }: { password: string }) {
@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
     try {
       const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
       if (updateError) {
-        setError('שגיאה בעדכון הסיסמה. נסה שוב.')
+        setError(mapPasswordUpdateError(updateError.code, updateError.message))
       } else {
         setSuccess(true)
       }

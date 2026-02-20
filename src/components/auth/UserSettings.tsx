@@ -4,7 +4,7 @@ import { useState, FormEvent, useCallback } from 'react'
 import { ChevronDown, Settings, CheckCircle, Circle } from 'lucide-react'
 import { Button, Input } from '@/components/ui'
 import { createClient } from '@/lib/supabase/client'
-import { validatePassword, getPasswordRules } from '@/lib/validation'
+import { validatePassword, getPasswordRules, mapPasswordUpdateError } from '@/lib/validation'
 import type { User } from '@supabase/supabase-js'
 
 interface UserSettingsProps {
@@ -56,12 +56,7 @@ function ChangePasswordForm() {
     try {
       const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
       if (updateError) {
-        const msg = updateError.message.toLowerCase()
-        if (msg.includes('reauthenticat') || msg.includes('session') || msg.includes('recently')) {
-          setError('For security reasons, please sign out and sign back in to change your password.')
-        } else {
-          setError('שגיאה בעדכון הסיסמה. נסה שוב.')
-        }
+        setError(mapPasswordUpdateError(updateError.code, updateError.message))
       } else {
         setSuccess(true)
         setNewPassword('')
