@@ -20,7 +20,11 @@ function mapSupabaseError(errorMessage: string): string {
   return key ? ERROR_MAP[key] : 'שגיאה בהתחברות. נסה שוב.'
 }
 
-export function EmailSignInForm() {
+interface EmailSignInFormProps {
+  onForgotPassword?: () => void
+}
+
+export function EmailSignInForm({ onForgotPassword }: EmailSignInFormProps) {
   const { signInWithEmail } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -104,6 +108,17 @@ export function EmailSignInForm() {
       >
         התחבר
       </Button>
+
+      {onForgotPassword && (
+        <button
+          type="button"
+          onClick={onForgotPassword}
+          className="w-full text-sm text-gray-500 hover:text-blue-600 transition-colors"
+        >
+          שכחת סיסמה?
+        </button>
+      )}
     </form>
   )
 }
+
