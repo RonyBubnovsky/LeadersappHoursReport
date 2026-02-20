@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plus, FileSpreadsheet, ChevronRight, BarChart3, X, Pencil } from 'lucide-react'
+import { UserSettings } from '@/components/auth'
 import { useAuth, useSheets } from '@/hooks'
 import { Button, Input, useConfirm, useInputDialog } from '@/components/ui'
 import { deleteUserAndData } from '@/services/userService'
@@ -213,9 +214,7 @@ export function Sidebar({
                 className="w-8 h-8 rounded-full flex-shrink-0"
               />
             )}
-            <span className="text-sm text-gray-700 truncate">
-              {user?.user_metadata?.full_name || user?.email}
-            </span>
+            {user && <UserSettings user={user} />}
           </div>
           <div className="flex gap-2">
             <Button onClick={signOut} variant="secondary" size="sm" className="flex-1">
