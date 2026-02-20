@@ -8,6 +8,8 @@ interface AuthContextType {
   user: User | null
   loading: boolean
   signInWithGoogle: () => Promise<void>
+  signInWithEmail: (email: string, password: string) => Promise<{ error?: string }>
+  signUpWithEmail: (email: string, password: string) => Promise<{ error?: string; needsConfirmation?: boolean }>
   signOut: () => Promise<void>
 }
 
@@ -60,6 +62,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
   }, [supabase.auth])
 
+  const signInWithEmail = useCallback(async (email: string, password: string): Promise<{ error?: string }> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { error: error.message }
+    return {}
+  }, [supabase.auth])
+
+  const signUpWithEmail = useCallback(async (email: string, password: string): Promise<{ error?: string; needsConfirmation?: boolean }> => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+    if (error) return { error: error.message }
+    // If identities array is empty, the user already exists
+    if (data.user && data.user.identities?.length === 0) {
+      return { error: 'user_already_exists' }
+    }
+    return { needsConfirmation: true }
+  }, [supabase.auth])
+
   const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
@@ -69,8 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     loading,
     signInWithGoogle,
+    signInWithEmail,
+    signUpWithEmail,
     signOut,
-  }), [user, loading, signInWithGoogle, signOut])
+  }), [user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut])
 
   return (
     <AuthContext.Provider value={value}>

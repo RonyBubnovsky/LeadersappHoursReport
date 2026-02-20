@@ -4,13 +4,17 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks'
 import { Button, Card, CardContent, LoadingScreen } from '@/components/ui'
+import { EmailSignInForm, EmailSignUpForm } from '@/components/auth'
 import { Clock } from 'lucide-react'
+
+type AuthTab = 'signin' | 'signup'
 
 export default function LoginPage() {
   const router = useRouter()
   const { user, loading: authLoading, signInWithGoogle } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<AuthTab>('signin')
 
   // Redirect to home if already authenticated
   useEffect(() => {
@@ -38,7 +42,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
       <Card variant="bordered" className="w-full max-w-md">
-        <CardContent className="space-y-8 p-8">
+        <CardContent className="space-y-6 p-8">
           {/* Logo & Title */}
           <div className="text-center space-y-4">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600">
@@ -84,6 +88,45 @@ export default function LoginPage() {
             </svg>
             התחבר עם Google
           </Button>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-white px-4 text-gray-400">או</span>
+            </div>
+          </div>
+
+          {/* Sign In / Sign Up Tabs */}
+          <div className="flex rounded-lg bg-gray-100 p-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab('signin')}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                activeTab === 'signin'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              התחברות
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('signup')}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                activeTab === 'signup'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              הרשמה
+            </button>
+          </div>
+
+          {/* Email Auth Forms */}
+          {activeTab === 'signin' ? <EmailSignInForm /> : <EmailSignUpForm />}
 
           {/* Footer */}
           <p className="text-center text-sm text-gray-400">
