@@ -15,17 +15,42 @@ export async function GET(request: Request) {
   if (token_hash && type) {
     const { error } = await supabase.auth.verifyOtp({ token_hash, type })
     if (!error) {
-      // Recovery links should go to the reset-password page
-      const destination = type === 'recovery' ? '/reset-password' : next
-      return NextResponse.redirect(`${origin}${destination}`)
+      // Recovery links: set a short-lived HTTP-only cookie so the
+      // /reset-password server component can verify this is legitimate.
+      if (type === 'recovery') {
+        const response = NextResponse.redirect(`${origin}/reset-password`)
+        response.cookies.set('password_recovery', 'true', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 300, // 5 minutes
+          path: '/',
+        })
+        return response
+      }
+      return NextResponse.redirect(`${origin}${next}`)
     }
     return NextResponse.redirect(`${origin}/login?error=confirmation`)
   }
 
-  // Handle OAuth code exchange (existing Google flow)
+  // Handle PKCE code exchange (OAuth + password recovery)
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      // Password recovery via PKCE: Supabase doesn't forward `type` in the
+      // redirect, so we detect recovery by the `next` param we set in
+      // ForgotPasswordForm's redirectTo URL.
+      if (next === '/reset-password') {
+        const response = NextResponse.redirect(`${origin}/reset-password`)
+        response.cookies.set('password_recovery', 'true', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 300, // 5 minutes
+          path: '/',
+        })
+        return response
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
   }
