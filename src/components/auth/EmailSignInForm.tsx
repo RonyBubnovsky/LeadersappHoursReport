@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent, useCallback } from 'react'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, PasswordInput } from '@/components/ui'
 import { validateEmail } from '@/lib/validation'
 import { useAuth } from '@/hooks'
 
@@ -82,16 +82,14 @@ export function EmailSignInForm({ onForgotPassword }: EmailSignInFormProps) {
         dir="ltr"
       />
 
-      <Input
+      <PasswordInput
         id="signin-password"
-        type="password"
         label="סיסמה"
         placeholder="••••••••"
         value={password}
         onChange={e => { setPassword(e.target.value); setFieldErrors(prev => ({ ...prev, password: undefined })) }}
         error={fieldErrors.password}
         autoComplete="current-password"
-        dir="ltr"
       />
 
       {error && (

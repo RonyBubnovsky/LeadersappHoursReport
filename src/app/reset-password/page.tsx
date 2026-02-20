@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FormEvent, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, Button, Input, LoadingScreen } from '@/components/ui'
+import { Card, CardContent, Button, PasswordInput, LoadingScreen } from '@/components/ui'
 import { createClient } from '@/lib/supabase/client'
 import { validatePassword, getPasswordRules, mapPasswordUpdateError } from '@/lib/validation'
 import { Clock, CheckCircle, Circle } from 'lucide-react'
@@ -134,9 +134,8 @@ export default function ResetPasswordPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <Input
+              <PasswordInput
                 id="reset-new-password"
-                type="password"
                 label="סיסמה חדשה"
                 placeholder="••••••••"
                 value={newPassword}
@@ -146,9 +145,8 @@ export default function ResetPasswordPage() {
               {newPassword.length > 0 && <PasswordChecklist password={newPassword} />}
             </div>
 
-            <Input
+            <PasswordInput
               id="reset-confirm-password"
-              type="password"
               label="אימות סיסמה חדשה"
               placeholder="••••••••"
               value={confirmPassword}
