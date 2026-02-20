@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent, useCallback } from 'react'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, PasswordInput } from '@/components/ui'
 import { validateEmail, validatePassword, getPasswordRules } from '@/lib/validation'
 import { useAuth } from '@/hooks'
 import { CheckCircle, Circle, Mail } from 'lucide-react'
@@ -141,30 +141,26 @@ export function EmailSignUpForm() {
       />
 
       <div>
-        <Input
+        <PasswordInput
           id="signup-password"
-          type="password"
           label="סיסמה"
           placeholder="••••••••"
           value={password}
           onChange={e => { setPassword(e.target.value); setFieldErrors(prev => ({ ...prev, password: undefined })) }}
           error={fieldErrors.password}
           autoComplete="new-password"
-          dir="ltr"
         />
         {password.length > 0 && <PasswordChecklist password={password} />}
       </div>
 
-      <Input
+      <PasswordInput
         id="signup-confirm-password"
-        type="password"
         label="אימות סיסמה"
         placeholder="••••••••"
         value={confirmPassword}
         onChange={e => { setConfirmPassword(e.target.value); setFieldErrors(prev => ({ ...prev, confirmPassword: undefined })) }}
         error={fieldErrors.confirmPassword}
         autoComplete="new-password"
-        dir="ltr"
       />
 
       {error && (

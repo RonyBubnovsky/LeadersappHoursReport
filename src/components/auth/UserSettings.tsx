@@ -2,7 +2,7 @@
 
 import { useState, FormEvent, useCallback } from 'react'
 import { ChevronDown, Settings, CheckCircle, Circle } from 'lucide-react'
-import { Button, Input } from '@/components/ui'
+import { Button, PasswordInput } from '@/components/ui'
 import { createClient } from '@/lib/supabase/client'
 import { validatePassword, getPasswordRules, mapPasswordUpdateError } from '@/lib/validation'
 import type { User } from '@supabase/supabase-js'
@@ -80,9 +80,8 @@ function ChangePasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
       <div>
-        <Input
+        <PasswordInput
           id="new-password"
-          type="password"
           placeholder="סיסמה חדשה"
           value={newPassword}
           onChange={e => { setNewPassword(e.target.value); setError(null) }}
@@ -90,9 +89,8 @@ function ChangePasswordForm() {
         />
         {newPassword.length > 0 && <PasswordChecklist password={newPassword} />}
       </div>
-      <Input
+      <PasswordInput
         id="confirm-new-password"
-        type="password"
         placeholder="אימות סיסמה חדשה"
         value={confirmPassword}
         onChange={e => { setConfirmPassword(e.target.value); setError(null) }}
