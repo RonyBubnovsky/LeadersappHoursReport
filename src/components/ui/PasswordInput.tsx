@@ -45,7 +45,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             className="absolute inset-y-0 end-0 flex items-center pe-3 text-gray-400 hover:text-gray-600 transition-colors"
             aria-label={visible ? 'הסתר סיסמה' : 'הצג סיסמה'}
           >
-            {visible ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+            {visible ? <Eye className="w-4.5 h-4.5" /> : <EyeOff className="w-4.5 h-4.5" />}
           </button>
         </div>
         {error && (
