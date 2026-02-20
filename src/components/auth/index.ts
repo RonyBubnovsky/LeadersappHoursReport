@@ -1,4 +1,8 @@
 export { EmailSignInForm } from './EmailSignInForm'
 export { EmailSignUpForm } from './EmailSignUpForm'
 export { ForgotPasswordForm } from './ForgotPasswordForm'
+export { GoogleSignInButton } from './GoogleSignInButton'
+export { AuthTabSwitcher } from './AuthTabSwitcher'
+export type { AuthTab } from './AuthTabSwitcher'
+export { LoginHeader } from './LoginHeader'
 export { UserSettings } from './UserSettings'
