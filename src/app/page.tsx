@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { toast } from 'sonner'
 import { Clock, Download, Trash2, Menu } from 'lucide-react'
 import { useAuth, useSheets, useEntries, useSidebarState, useSavedExports, useAllSheetsTotalHours } from '@/hooks'
 import { Sidebar, NavBar } from '@/components/layout'
@@ -11,7 +12,16 @@ import { exportToExcel, exportAllToExcel } from '@/lib/excel'
 import type { Sheet } from '@/types'
 
 export default function Dashboard() {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <DashboardContent />
+    </Suspense>
+  )
+}
+
+function DashboardContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, loading: authLoading } = useAuth()
   const { sheets, deleteSheet, refetch: refetchSheets } = useSheets()
   const { addExport } = useSavedExports()
@@ -30,6 +40,16 @@ export default function Dashboard() {
       router.push('/login')
     }
   }, [user, authLoading, router])
+
+  // Show success toast when arriving from email verification
+  useEffect(() => {
+    if (searchParams.get('verified') === 'true') {
+      toast.success('האימייל אומת בהצלחה! ברוך הבא', {
+        duration: 3000,
+      })
+      router.replace('/', { scroll: false })
+    }
+  }, [searchParams, router])
 
   // Lazy load sheets when visiting home page
   useEffect(() => {

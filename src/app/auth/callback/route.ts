@@ -28,7 +28,10 @@ export async function GET(request: Request) {
         })
         return response
       }
-      return NextResponse.redirect(`${origin}${next}`)
+      // Signup verification: signal the dashboard to show a success toast
+      const redirectUrl = new URL(next, origin)
+      redirectUrl.searchParams.set('verified', 'true')
+      return NextResponse.redirect(redirectUrl.toString())
     }
     return NextResponse.redirect(`${origin}/login?error=confirmation`)
   }
@@ -51,7 +54,10 @@ export async function GET(request: Request) {
         })
         return response
       }
-      return NextResponse.redirect(`${origin}${next}`)
+      // Signup verification: signal the dashboard to show a success toast
+      const redirectUrl = new URL(next, origin)
+      redirectUrl.searchParams.set('verified', 'true')
+      return NextResponse.redirect(redirectUrl.toString())
     }
   }
 
