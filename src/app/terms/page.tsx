@@ -74,10 +74,10 @@ export default function TermsPage() {
             <SectionTitle>2. הגדרות</SectionTitle>
             <SubSection>
               <ul className="list-disc list-inside space-y-1 mr-2">
-                <li><strong>&quot;משתמש&quot;</strong> — כל אדם הנכנס לאתר או הנרשם לשירות.</li>
-                <li><strong>&quot;מידע אישי&quot;</strong> — מידע המזהה אותך באופן אישי, כגון כתובת אימייל.</li>
-                <li><strong>&quot;תוכן משתמש&quot;</strong> — כל המידע שאתה מזין לשירות, כולל נתוני שעות עבודה, שמות גיליונות ורשומות.</li>
-                <li><strong>&quot;עוגיות (Cookies)&quot;</strong> — קבצי טקסט קטנים הנשמרים על המכשיר שלך לצורך תפעול השירות.</li>
+                <li><strong>&quot;משתמש&quot;</strong> - כל אדם הנכנס לאתר או הנרשם לשירות.</li>
+                <li><strong>&quot;מידע אישי&quot;</strong> - מידע המזהה אותך באופן אישי, כגון כתובת אימייל.</li>
+                <li><strong>&quot;תוכן משתמש&quot;</strong> - כל המידע שאתה מזין לשירות, כולל נתוני שעות עבודה, שמות גיליונות ורשומות.</li>
+                <li><strong>&quot;עוגיות (Cookies)&quot;</strong> - קבצי טקסט קטנים הנשמרים על המכשיר שלך לצורך תפעול השירות.</li>
               </ul>
             </SubSection>
 
@@ -85,9 +85,9 @@ export default function TermsPage() {
             <SectionTitle>3. איסוף מידע</SectionTitle>
             <SubSection title="3.1 מידע שאתה מספק לנו">
               <ul className="list-disc list-inside space-y-1 mr-2">
-                <li>כתובת אימייל — בעת הרשמה לשירות.</li>
-                <li>סיסמה — מוצפנת ומאוחסנת באופן מאובטח (במקרה של הרשמה באימייל).</li>
-                <li>נתוני שעות עבודה — רשומות שעות, שמות גיליונות, ומידע נלווה שאתה מזין.</li>
+                <li>כתובת אימייל - בעת הרשמה לשירות.</li>
+                <li>סיסמה - מוצפנת ומאוחסנת באופן מאובטח (במקרה של הרשמה באימייל).</li>
+                <li>נתוני שעות עבודה - רשומות שעות, שמות גיליונות, ומידע נלווה שאתה מזין.</li>
               </ul>
             </SubSection>
             <SubSection title="3.2 מידע שנאסף אוטומטית">
@@ -138,8 +138,8 @@ export default function TermsPage() {
                 האתר משתמש <strong>אך ורק בעוגיות הכרחיות</strong> הנדרשות לתפעול השירות:
               </p>
               <ul className="list-disc list-inside space-y-1 mr-2 mt-2">
-                <li><strong>עוגיות אימות (Authentication Cookies)</strong> — לשמירת מצב ההתחברות שלך.</li>
-                <li><strong>עוגיות סשן (Session Cookies)</strong> — לניהול הפגישה הפעילה שלך באתר.</li>
+                <li><strong>עוגיות אימות (Authentication Cookies)</strong> - לשמירת מצב ההתחברות שלך.</li>
+                <li><strong>עוגיות סשן (Session Cookies)</strong> - לניהול הפגישה הפעילה שלך באתר.</li>
               </ul>
               <p className="mt-2">
                 איננו משתמשים בעוגיות מעקב, עוגיות פרסום, או עוגיות של צדדים שלישיים.
@@ -172,12 +172,12 @@ export default function TermsPage() {
                 מומלצות לשנת 2026, עומדות לך הזכויות הבאות:
               </p>
               <ul className="list-disc list-inside space-y-1 mr-2 mt-2">
-                <li><strong>זכות גישה</strong> — לעיין במידע האישי שלך המאוחסן אצלנו.</li>
-                <li><strong>זכות תיקון</strong> — לתקן מידע שגוי או לא מדויק.</li>
-                <li><strong>זכות מחיקה (&quot;הזכות להישכח&quot;)</strong> — לבקש מחיקת כל המידע האישי שלך.</li>
-                <li><strong>זכות ניידות</strong> — לקבל את המידע שלך בפורמט מובנה (ייצוא לאקסל).</li>
-                <li><strong>זכות הגבלת עיבוד</strong> — לבקש הגבלת השימוש במידע שלך.</li>
-                <li><strong>זכות התנגדות</strong> — להתנגד לעיבוד המידע שלך.</li>
+                <li><strong>זכות גישה</strong> - לעיין במידע האישי שלך המאוחסן אצלנו.</li>
+                <li><strong>זכות תיקון</strong> - לתקן מידע שגוי או לא מדויק.</li>
+                <li><strong>זכות מחיקה (&quot;הזכות להישכח&quot;)</strong> - לבקש מחיקת כל המידע האישי שלך.</li>
+                <li><strong>זכות ניידות</strong> - לקבל את המידע שלך בפורמט מובנה (ייצוא לאקסל).</li>
+                <li><strong>זכות הגבלת עיבוד</strong> - לבקש הגבלת השימוש במידע שלך.</li>
+                <li><strong>זכות התנגדות</strong> - להתנגד לעיבוד המידע שלך.</li>
               </ul>
               <p className="mt-2">
                 לצורך מימוש זכויותיך, ניתן לפנות אלינו בכתובת{' '}
@@ -198,11 +198,11 @@ export default function TermsPage() {
               <p>המידע שלך עשוי להיות משותף אך ורק במקרים הבאים:</p>
               <ul className="list-disc list-inside space-y-1 mr-2 mt-1">
                 <li>
-                  <strong>ספקי שירות</strong> — Supabase (אחסון ואימות), Google (התחברות דרך Google OAuth)
-                  — אך ורק במידה הנדרשת לתפעול השירות.
+                  <strong>ספקי שירות</strong> - Supabase (אחסון ואימות), Google (התחברות דרך Google OAuth)
+                  - אך ורק במידה הנדרשת לתפעול השירות.
                 </li>
                 <li>
-                  <strong>דרישה חוקית</strong> — אם נידרש לכך על פי חוק, צו בית משפט או הליך משפטי.
+                  <strong>דרישה חוקית</strong> - אם נידרש לכך על פי חוק, צו בית משפט או הליך משפטי.
                 </li>
               </ul>
             </SubSection>
