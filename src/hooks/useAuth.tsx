@@ -9,7 +9,7 @@ interface AuthContextType {
   loading: boolean
   signInWithGoogle: () => Promise<void>
   signInWithEmail: (email: string, password: string) => Promise<{ error?: string }>
-  signUpWithEmail: (email: string, password: string) => Promise<{ error?: string; needsConfirmation?: boolean }>
+  signUpWithEmail: (email: string, password: string, acceptedTerms: boolean) => Promise<{ error?: string; needsConfirmation?: boolean }>
   signOut: () => Promise<void>
 }
 
@@ -68,21 +68,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {}
   }, [supabase.auth])
 
-  const signUpWithEmail = useCallback(async (email: string, password: string): Promise<{ error?: string; needsConfirmation?: boolean }> => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) return { error: error.message }
-    // If identities array is empty, the user already exists
-    if (data.user && data.user.identities?.length === 0) {
-      return { error: 'user_already_exists' }
+  const signUpWithEmail = useCallback(async (email: string, password: string, acceptedTerms: boolean): Promise<{ error?: string; needsConfirmation?: boolean }> => {
+    if (!acceptedTerms) {
+      return { error: 'יש לאשר את תנאי השימוש ומדיניות הפרטיות' }
     }
-    return { needsConfirmation: true }
-  }, [supabase.auth])
+
+    // Call server-side API to enforce terms validation on the server
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, acceptedTerms }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      return { error: data.error || 'שגיאה בהרשמה. נסה שוב.' }
+    }
+
+    return { needsConfirmation: data.needsConfirmation }
+  }, [])
 
   const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut()

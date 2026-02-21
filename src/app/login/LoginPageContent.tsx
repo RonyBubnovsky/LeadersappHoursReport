@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/hooks'
 import { Card, CardContent, LoadingScreen } from '@/components/ui'
 import {
@@ -106,7 +107,10 @@ export default function LoginPageContent() {
 
           {/* Footer */}
           <p className="text-center text-sm text-gray-400">
-            הנתונים שלך מאובטחים ונשמרים בענן
+            הנתונים שלך מאובטחים ונשמרים בענן · {' '}
+            <Link href="/terms" className="text-blue-500 hover:underline">
+              תנאי שימוש ומדיניות פרטיות
+            </Link>
           </p>
         </CardContent>
       </Card>
