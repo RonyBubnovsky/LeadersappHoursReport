@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, FormEvent, useCallback } from 'react'
+import Link from 'next/link'
 import { Button, Input, PasswordInput } from '@/components/ui'
 import { validateEmail, validatePassword, getPasswordRules } from '@/lib/validation'
 import { useAuth } from '@/hooks'
@@ -70,13 +71,14 @@ export function EmailSignUpForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({})
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string; confirmPassword?: string; terms?: string }>({})
 
   const validate = useCallback((): boolean => {
-    const errors: { email?: string; password?: string; confirmPassword?: string } = {}
+    const errors: { email?: string; password?: string; confirmPassword?: string; terms?: string } = {}
 
     if (!email.trim()) {
       errors.email = 'שדה חובה'
@@ -97,9 +99,13 @@ export function EmailSignUpForm() {
       errors.confirmPassword = 'הסיסמאות אינן תואמות'
     }
 
+    if (!termsAccepted) {
+      errors.terms = 'יש לאשר את תנאי השימוש ומדיניות הפרטיות'
+    }
+
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
-  }, [email, password, confirmPassword])
+  }, [email, password, confirmPassword, termsAccepted])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -109,7 +115,7 @@ export function EmailSignUpForm() {
 
     setLoading(true)
     try {
-      const result = await signUpWithEmail(email, password)
+      const result = await signUpWithEmail(email, password, true)
       if (result.error) {
         setError(mapSupabaseError(result.error))
       } else if (result.needsConfirmation) {
@@ -162,6 +168,31 @@ export function EmailSignUpForm() {
         error={fieldErrors.confirmPassword}
         autoComplete="new-password"
       />
+
+      {/* Terms acceptance */}
+      <div className="space-y-1">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={e => { setTermsAccepted(e.target.checked); setFieldErrors(prev => ({ ...prev, terms: undefined })) }}
+            className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 shrink-0"
+          />
+          <span className="text-sm text-gray-600">
+            קראתי ואני מסכים/ה ל
+            <Link
+              href="/terms"
+              target="_blank"
+              className="text-blue-600 hover:underline font-medium"
+            >
+              תנאי השימוש ומדיניות הפרטיות
+            </Link>
+          </span>
+        </label>
+        {fieldErrors.terms && (
+          <p className="text-xs text-red-500 mr-7">{fieldErrors.terms}</p>
+        )}
+      </div>
 
       {error && (
         <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm text-center">
