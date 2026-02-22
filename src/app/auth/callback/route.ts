@@ -38,7 +38,7 @@ export async function GET(request: Request) {
 
   // Handle PKCE code exchange (OAuth + password recovery)
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       // Password recovery via PKCE: Supabase doesn't forward `type` in the
       // redirect, so we detect recovery by the `next` param we set in
@@ -54,10 +54,15 @@ export async function GET(request: Request) {
         })
         return response
       }
-      // Signup verification: signal the dashboard to show a success toast
-      const redirectUrl = new URL(next, origin)
-      redirectUrl.searchParams.set('verified', 'true')
-      return NextResponse.redirect(redirectUrl.toString())
+      // Email provider verification: show success toast
+      const provider = data.user?.app_metadata?.provider
+      if (provider === 'email') {
+        const redirectUrl = new URL(next, origin)
+        redirectUrl.searchParams.set('verified', 'true')
+        return NextResponse.redirect(redirectUrl.toString())
+      }
+      // OAuth login (e.g. Google): just redirect without verified flag
+      return NextResponse.redirect(`${origin}${next}`)
     }
   }
 
