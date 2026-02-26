@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, FileSpreadsheet, ChevronRight, BarChart3, X, Pencil } from 'lucide-react'
+import { Plus, FileSpreadsheet, ChevronRight, BarChart3, X, Pencil, Trash2 } from 'lucide-react'
 import { UserSettings } from '@/components/auth'
 import { useAuth, useSheets } from '@/hooks'
 import { Button, Input, useConfirm, useInputDialog } from '@/components/ui'
@@ -32,7 +32,7 @@ export function Sidebar({
   hasInteracted = false
 }: SidebarProps) {
   const { user, signOut } = useAuth()
-  const { sheets, loading, createSheet, updateSheet } = useSheets()
+  const { sheets, loading, createSheet, updateSheet, deleteSheet } = useSheets()
   const promptInput = useInputDialog()
   const [newSheetName, setNewSheetName] = useState('')
   const [isCreating, setIsCreating] = useState(false)
@@ -89,6 +89,27 @@ export function Sidebar({
     })
     if (newName && newName.trim() && newName !== sheet.name) {
       await updateSheet(sheet.id, newName.trim())
+    }
+  }
+
+  const handleDeleteSheet = async (e: React.MouseEvent, sheet: Sheet) => {
+    e.stopPropagation()
+    const confirmed = await confirm({
+      title: 'מחיקת גיליון',
+      message: `האם אתה בטוח שברצונך למחוק את הגיליון "${sheet.name}"? כל הרשומות בגיליון זה יימחקו לצמיתות.`,
+      confirmText: 'מחק גיליון',
+      cancelText: 'ביטול',
+      variant: 'danger',
+    })
+    if (confirmed) {
+      try {
+        await deleteSheet(sheet.id)
+        if (selectedSheet?.id === sheet.id) {
+          onSelectSheet(null)
+        }
+      } catch (error) {
+        console.error('Failed to delete sheet:', error)
+      }
     }
   }
 
@@ -176,14 +197,23 @@ export function Sidebar({
                 >
                   <ChevronRight className="w-4 h-4 flex-shrink-0 self-center" />
                   <span className="truncate flex-1 text-right">{sheet.name}</span>
-                  <span
-                    role="button"
-                    onClick={(e) => handleEditSheet(e, sheet)}
-                    className={`p-1 rounded hover:bg-gray-200 transition-opacity inline-flex items-center justify-center ${
+                  <span className={`inline-flex items-center gap-0.5 transition-opacity ${
                       isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                    }`}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
+                    }`}>
+                    <span
+                      role="button"
+                      onClick={(e) => handleEditSheet(e, sheet)}
+                      className="p-1 rounded hover:bg-gray-200 inline-flex items-center justify-center"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </span>
+                    <span
+                      role="button"
+                      onClick={(e) => handleDeleteSheet(e, sheet)}
+                      className="p-1 rounded hover:bg-red-100 text-red-500 inline-flex items-center justify-center"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </span>
                   </span>
                 </button>
               ))}
