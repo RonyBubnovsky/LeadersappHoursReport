@@ -51,12 +51,12 @@ export default function TermsPage() {
                 ברוכים הבאים לאתר <strong>דיווח שעות LeadersApp</strong> (להלן: &quot;האתר&quot; או &quot;השירות&quot;),
                 הזמין בכתובת{' '}
                 <a
-                  href="https://www.leaders-app-hours-report.club"
+                  href="https://leaders-app-hours-report.club"
                   className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  www.leaders-app-hours-report.club
+                  leaders-app-hours-report.club
                 </a>
                 .
               </p>

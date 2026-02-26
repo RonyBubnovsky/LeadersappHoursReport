@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "דיווח שעות LeadersApp",
   description: "ניהול העבודה שלך בצורה הפשוטה ביותר",
-  metadataBase: new URL("https://www.leaders-app-hours-report.club"),
+  metadataBase: new URL("https://leaders-app-hours-report.club"),
   openGraph: {
     title: "דיווח שעות LeadersApp",
     description: "ניהול העבודה שלך בצורה הפשוטה ביותר",
-    url: "https://www.leaders-app-hours-report.club",
+    url: "https://leaders-app-hours-report.club",
     siteName: "LeadersApp Hours Report",
     images: [
       {
