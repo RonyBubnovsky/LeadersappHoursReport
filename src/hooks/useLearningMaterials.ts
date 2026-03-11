@@ -2,10 +2,10 @@
 
 import { createContext, useContext, useState, useCallback, useMemo, useRef, ReactNode, createElement } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { AttendanceLink } from '@/types'
+import type { LearningMaterial } from '@/types'
 
-interface AttendanceLinksContextType {
-  links: AttendanceLink[]
+interface LearningMaterialsContextType {
+  links: LearningMaterial[]
   loading: boolean
   error: string | null
   addLink: (name: string, url: string) => Promise<void>
@@ -15,10 +15,10 @@ interface AttendanceLinksContextType {
   refetch: () => Promise<void>
 }
 
-const AttendanceLinksContext = createContext<AttendanceLinksContextType | null>(null)
+const LearningMaterialsContext = createContext<LearningMaterialsContextType | null>(null)
 
-export function AttendanceLinksProvider({ children }: { children: ReactNode }) {
-  const [links, setLinks] = useState<AttendanceLink[]>([])
+export function LearningMaterialsProvider({ children }: { children: ReactNode }) {
+  const [links, setLinks] = useState<LearningMaterial[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const hasFetchedRef = useRef(false)
@@ -35,7 +35,7 @@ export function AttendanceLinksProvider({ children }: { children: ReactNode }) {
     setError(null)
 
     const { data, error } = await supabase
-      .from('attendance_links')
+      .from('learning_materials')
       .select('*')
       .order('created_at', { ascending: false })
 
@@ -54,7 +54,7 @@ export function AttendanceLinksProvider({ children }: { children: ReactNode }) {
     if (!user) throw new Error('Not authenticated')
 
     const { data, error } = await supabase
-      .from('attendance_links')
+      .from('learning_materials')
       .insert({ user_id: user.id, name, url })
       .select()
       .single()
@@ -68,7 +68,7 @@ export function AttendanceLinksProvider({ children }: { children: ReactNode }) {
     if (!user) throw new Error('Not authenticated')
 
     const { error } = await supabase
-      .from('attendance_links')
+      .from('learning_materials')
       .update({ name, url })
       .eq('id', id)
 
@@ -81,7 +81,7 @@ export function AttendanceLinksProvider({ children }: { children: ReactNode }) {
     if (!user) throw new Error('Not authenticated')
 
     const { error } = await supabase
-      .from('attendance_links')
+      .from('learning_materials')
       .delete()
       .eq('id', id)
 
@@ -94,7 +94,7 @@ export function AttendanceLinksProvider({ children }: { children: ReactNode }) {
     if (!user) throw new Error('Not authenticated')
 
     const { error } = await supabase
-      .from('attendance_links')
+      .from('learning_materials')
       .delete()
       .eq('user_id', user.id)
 
@@ -103,16 +103,16 @@ export function AttendanceLinksProvider({ children }: { children: ReactNode }) {
   }
 
   return createElement(
-    AttendanceLinksContext.Provider,
+    LearningMaterialsContext.Provider,
     { value: { links, loading, error, addLink, updateLink, deleteLink, deleteAllLinks, refetch: fetchLinks } },
     children
   )
 }
 
-export function useAttendanceLinks() {
-  const context = useContext(AttendanceLinksContext)
+export function useLearningMaterials() {
+  const context = useContext(LearningMaterialsContext)
   if (!context) {
-    throw new Error('useAttendanceLinks must be used within an AttendanceLinksProvider')
+    throw new Error('useLearningMaterials must be used within a LearningMaterialsProvider')
   }
   return context
 }

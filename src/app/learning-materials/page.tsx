@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ClipboardList, Plus, ExternalLink, Trash2, Link2, X, Pencil } from 'lucide-react'
-import { useAuth, useAttendanceLinks } from '@/hooks'
+import { BookOpen, Plus, ExternalLink, Trash2, Link2, X, Pencil } from 'lucide-react'
+import { useAuth, useLearningMaterials } from '@/hooks'
 import { NavBar } from '@/components/layout'
 import { Button, Input, Card, CardContent, LoadingScreen, useConfirm } from '@/components/ui'
 
-export default function AttendancePage() {
+export default function LearningMaterialsPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const { links, loading, error, addLink, updateLink, deleteLink, deleteAllLinks, refetch } = useAttendanceLinks()
+  const { links, loading, error, addLink, updateLink, deleteLink, deleteAllLinks, refetch } = useLearningMaterials()
   const confirm = useConfirm()
 
   const [showModal, setShowModal] = useState(false)
@@ -125,21 +125,21 @@ export default function AttendancePage() {
           <header className="mb-6 md:mb-8">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-teal-600">
-                  <ClipboardList className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                <div className="p-2 rounded-xl bg-purple-600">
+                  <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-white" />
                 </div>
                 <div>
                   <h1 className="text-lg md:text-2xl font-bold text-gray-900">
-                    נוכחות
+                    חומרי לימוד
                   </h1>
                   <p className="text-gray-500 text-xs md:text-sm hidden sm:block">
-                    קישורים לדרייבים ואתרי נוכחות
+                    קישורים לחומרי לימוד
                   </p>
                 </div>
               </div>
               <Button onClick={() => openModal()} size="sm">
                 <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">הוסף נוכחות</span>
+                <span className="hidden sm:inline">הוסף חומר</span>
                 <span className="sm:hidden">הוסף</span>
               </Button>
               {links.length > 0 && (
@@ -165,25 +165,25 @@ export default function AttendancePage() {
           ) : loading ? (
             <Card variant="bordered" className="text-center py-12">
               <CardContent>
-                <div className="w-8 h-8 border-4 border-gray-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4" />
+                <div className="w-8 h-8 border-4 border-gray-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4" />
                 <p className="text-gray-500">טוען קישורים...</p>
               </CardContent>
             </Card>
           ) : links.length === 0 ? (
             <Card variant="bordered" className="text-center py-12 md:py-16">
               <CardContent>
-                <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-teal-50 mb-6">
-                  <Link2 className="w-8 h-8 md:w-10 md:h-10 text-teal-600" />
+                <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-purple-50 mb-6">
+                  <Link2 className="w-8 h-8 md:w-10 md:h-10 text-purple-600" />
                 </div>
                 <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
-                  אין קישורים שמורים
+                  אין חומרי לימוד שמורים
                 </h2>
                 <p className="text-gray-500 max-w-md mx-auto text-sm md:text-base mb-6">
-                  הוסף קישורים לדרייבים ואתרי נוכחות כדי לגשת אליהם בקלות
+                  הוסף קישורים לחומרי לימוד כדי לגשת אליהם בקלות
                 </p>
                 <Button onClick={() => openModal()}>
                   <Plus className="w-4 h-4" />
-                  הוסף נוכחות
+                  הוסף חומר
                 </Button>
               </CardContent>
             </Card>
@@ -195,10 +195,10 @@ export default function AttendancePage() {
                     <div className="flex items-start justify-between gap-3">
                       <button
                         onClick={() => openLink(link.url)}
-                        className="flex items-center gap-2 min-w-0 flex-1 text-right hover:text-teal-700 transition-colors"
+                        className="flex items-center gap-2 min-w-0 flex-1 text-right hover:text-purple-700 transition-colors"
                       >
-                        <ExternalLink className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                        <span className="font-medium text-gray-900 group-hover:text-teal-700 transition-colors break-words text-right">
+                        <ExternalLink className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                        <span className="font-medium text-gray-900 group-hover:text-purple-700 transition-colors break-words text-right">
                           {link.name}
                         </span>
                       </button>
@@ -247,23 +247,23 @@ export default function AttendancePage() {
 
             <div className="p-6">
               <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-full bg-teal-100 text-teal-600">
+                <div className="p-3 rounded-full bg-purple-100 text-purple-600">
                   <Link2 className="w-8 h-8" />
                 </div>
               </div>
 
               <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                {editingId ? 'עריכת נוכחות' : 'הוסף נוכחות'}
+                {editingId ? 'עריכת חומר לימוד' : 'הוסף חומר לימוד'}
               </h3>
               <p className="text-gray-500 text-center mb-4">
-                {editingId ? 'ערוך את השם או הקישור' : 'הזן שם וקישור לאתר או דרייב'}
+                {editingId ? 'ערוך את השם או הקישור' : 'הזן שם וקישור לחומר לימוד'}
               </p>
 
               <div className="space-y-3 mb-6">
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="שם (למשל: נוכחות כיתה א׳)"
+                  placeholder="שם (למשל: מצגת שיעור 1)"
                   autoFocus
                 />
                 <Input
