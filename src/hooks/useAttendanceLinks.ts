@@ -11,6 +11,7 @@ interface AttendanceLinksContextType {
   addLink: (name: string, url: string) => Promise<void>
   updateLink: (id: string, name: string, url: string) => Promise<void>
   deleteLink: (id: string) => Promise<void>
+  deleteAllLinks: () => Promise<void>
   refetch: () => Promise<void>
 }
 
@@ -88,9 +89,22 @@ export function AttendanceLinksProvider({ children }: { children: ReactNode }) {
     setLinks(prev => prev.filter(l => l.id !== id))
   }
 
+  const deleteAllLinks = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { error } = await supabase
+      .from('attendance_links')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (error) throw error
+    setLinks([])
+  }
+
   return createElement(
     AttendanceLinksContext.Provider,
-    { value: { links, loading, error, addLink, updateLink, deleteLink, refetch: fetchLinks } },
+    { value: { links, loading, error, addLink, updateLink, deleteLink, deleteAllLinks, refetch: fetchLinks } },
     children
   )
 }

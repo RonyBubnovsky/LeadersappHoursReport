@@ -10,7 +10,7 @@ import { Button, Input, Card, CardContent, LoadingScreen, useConfirm } from '@/c
 export default function LearningMaterialsPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const { links, loading, error, addLink, updateLink, deleteLink, refetch } = useLearningMaterials()
+  const { links, loading, error, addLink, updateLink, deleteLink, deleteAllLinks, refetch } = useLearningMaterials()
   const confirm = useConfirm()
 
   const [showModal, setShowModal] = useState(false)
@@ -99,6 +99,23 @@ export default function LearningMaterialsPage() {
     window.open(linkUrl, '_blank', 'noopener,noreferrer')
   }
 
+  const handleDeleteAll = async () => {
+    const confirmed = await confirm({
+      title: 'מחיקת כל הקישורים',
+      message: 'האם אתה בטוח שברצונך למחוק את כל הקישורים? פעולה זו בלתי הפיכה.',
+      confirmText: 'מחק הכל',
+      cancelText: 'ביטול',
+      variant: 'danger',
+    })
+    if (confirmed) {
+      try {
+        await deleteAllLinks()
+      } catch {
+        alert('שגיאה במחיקת הקישורים')
+      }
+    }
+  }
+
   return (
     <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
       <NavBar />
@@ -125,6 +142,13 @@ export default function LearningMaterialsPage() {
                 <span className="hidden sm:inline">הוסף חומר</span>
                 <span className="sm:hidden">הוסף</span>
               </Button>
+              {links.length > 0 && (
+                <Button onClick={handleDeleteAll} variant="danger" size="sm">
+                  <Trash2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">מחק הכל</span>
+                  <span className="sm:hidden">מחק הכל</span>
+                </Button>
+              )}
             </div>
           </header>
 
