@@ -71,3 +71,12 @@ export interface AttendanceLink {
   url: string
   created_at: string
 }
+
+// Learning material link (external links to study materials)
+export interface LearningMaterial {
+  id: string
+  user_id: string
+  name: string
+  url: string
+  created_at: string
+}

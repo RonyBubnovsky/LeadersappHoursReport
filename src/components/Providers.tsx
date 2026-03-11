@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react'
 import { Toaster } from 'sonner'
-import { AuthProvider, SheetsProvider, EntriesProvider, ScheduleProvider, SavedExportsProvider, AdminProvider, AttendanceLinksProvider } from '@/hooks'
+import { AuthProvider, SheetsProvider, EntriesProvider, ScheduleProvider, SavedExportsProvider, AdminProvider, AttendanceLinksProvider, LearningMaterialsProvider } from '@/hooks'
 import { ConfirmProvider, InputDialogProvider } from '@/components/ui'
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -16,6 +16,7 @@ export function Providers({ children }: { children: ReactNode }) {
                 <SavedExportsProvider>
                   <AdminProvider>
                     <AttendanceLinksProvider>
+                      <LearningMaterialsProvider>
                       {children}
                       <Toaster
                         position="top-center"
@@ -28,6 +29,7 @@ export function Providers({ children }: { children: ReactNode }) {
                           },
                         }}
                       />
+                      </LearningMaterialsProvider>
                     </AttendanceLinksProvider>
                   </AdminProvider>
                 </SavedExportsProvider>
